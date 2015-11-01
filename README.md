@@ -60,6 +60,9 @@ After running `css-expand`, internal and external CSS style information are expa
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:css="http://www.w3.org/1996/css">
   <head>
     <title>css-expand expample</title>
+    <style type="text/css">
+      .red {color:red}
+    </style>
   </head>
   <body>
     <p class="red" css:color="red">This text has the color red.</p>
