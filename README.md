@@ -57,7 +57,8 @@ that you have to include [xproc-utils](https://github.com/transpect/xproc-util).
 After running `css-expand`, internal and external CSS style information are expanded as XML attributes.
 ```html
 <?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:css="http://www.w3.org/1996/css">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+  xmlns:css="http://www.w3.org/1996/css">
   <head>
     <title>css-expand expample</title>
     <style type="text/css">
