@@ -20,7 +20,7 @@
   </xsl:template>
 
   <xsl:template match="css" mode="create-xsl">
-    <xslout:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:letex="http://www.le-tex.de/namespace" xmlns:css="http://www.w3.org/1996/css">
+    <xslout:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tr="http://transpect.io" xmlns:css="http://www.w3.org/1996/css">
       <xsl:sequence select="document('css-util.xsl')/*/node()" />
       <xslout:template match="/">
         <xslout:variable name="add-css-info">
