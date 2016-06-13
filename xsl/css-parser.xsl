@@ -14,7 +14,6 @@
   <xsl:param name="base-uri" select="base-uri(/*)" as="xs:string" />
 
   <xsl:template match="/">
-    
     <css xmlns="http://www.w3.org/1996/css">
       <xsl:choose>
         <xsl:when test="matches(base-uri(/*), '^file:/')">
@@ -84,7 +83,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   </xsl:template>
 
   <xsl:template match="html:style" mode="extract-css">
-    <xsl:sequence select="tr:extract-css(string-join(for $n in node() return $n, ''), 'internal')" />
+    <xsl:sequence select="tr:extract-css(string-join(for $n in node() return $n, ''), 'file://internal')" />
   </xsl:template>
 
   <xsl:function name="tr:extract-css" as="element(*)*">
@@ -502,7 +501,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     <xsl:param name="at-rule" as="xs:string" />
     <xsl:param name="origin" as="xs:string" tunnel="yes"/>
     <xsl:variable name="base-uri-also-considering-current-css-file" as="xs:string"
-      select="($origin[not(. = 'internal')], $base-uri)[1]"/>
+      select="($origin[not(. = 'file://internal')], $base-uri)[1]"/>
     <xsl:for-each select="tokenize($at-rule, '@')[matches(., '\S+')]">
       <xsl:variable name="type">
         <xsl:value-of select="substring-before(replace(., '\s\s+|\{', '&#x20;'), '&#x20;')" />

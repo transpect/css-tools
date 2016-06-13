@@ -85,11 +85,11 @@
         </xslout:template>
       </xsl:for-each>
 
-      <xslout:template match="*[@style[not(matches(., '(background-image|margin:)'))]]" mode="add-style-info">
+      <xslout:template match="*[@style]" mode="add-style-info">
         <xslout:variable name="style-info" as="element(*)*"><!-- css:shorthand, css:declaration -->
           <xslout:call-template name="declarations">
             <xslout:with-param name="raw-declarations" select="@style"/>
-            <xslout:with-param name="origin" select="'internal'" tunnel="yes"/>
+            <xslout:with-param name="origin" select="'file://internal'" tunnel="yes"/>
           </xslout:call-template>
         </xslout:variable>
         <xslout:copy>
