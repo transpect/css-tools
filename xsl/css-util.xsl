@@ -18,7 +18,7 @@
     <xsl:param name="raw-declarations" as="xs:string"/>
     <xsl:param name="origin" tunnel="yes" as="xs:string?"/>
     <xsl:for-each select="tokenize($raw-declarations, ';\s*')[matches(., '\S')]">
-      <xsl:variable name="prop" select="substring-before(., ':')" />
+      <xsl:variable name="prop" select="normalize-space(substring-before(., ':'))" />
       <xsl:variable name="val" select="replace(normalize-space(substring-after(., ':')), '\s?!important', '')" />
       <xsl:variable name="check-shorthand-property" select="$prop=$css-shorthand-properties" as="xs:boolean" />
       <xsl:choose>
