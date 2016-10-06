@@ -233,16 +233,18 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     <xsl:param name="selector" as="xs:string"/>
     <xsl:variable name="combinators" select="'[+> ]'" as="xs:string"/>
     <xsl:variable name="parsed" as="element(*)*">
-      <xsl:analyze-string select="normalize-space($selector)" regex=" ?([+>~ ]) ?">
+      <!-- there is no negative lookahead in xpath2, such as  ?([+>~ ])(?!=) ? 
+           to distinguish between [title~=bar] and a~span
+           http://stackoverflow.com/questions/18144037/why-xslt-lookahead-pattern-is-not-worked-in-saxon-he-9-4-java
+      -->
+      <xsl:analyze-string select="normalize-space($selector)" regex=" ?([a-z\-]*\[[a-z\-\s]+~=[a-z\-\s]+\]) ?">
         <xsl:matching-substring>
-          <combinator>
+          <selector>
             <xsl:sequence select="regex-group(1)"/>
-          </combinator>
+          </selector>
         </xsl:matching-substring>
         <xsl:non-matching-substring>
-          <selector>
-            <xsl:sequence select="."/>
-          </selector>
+          <xsl:sequence select="tr:analyze-combinators-and-selectors(.)"/>
         </xsl:non-matching-substring>
       </xsl:analyze-string>
     </xsl:variable>
@@ -263,6 +265,22 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
         <xsl:sequence select="tr:combined-selector2xpath($parsed)"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:function>
+  
+  <xsl:function name="tr:analyze-combinators-and-selectors" as="element()+">
+    <xsl:param name="selector" as="xs:string"/>
+    <xsl:analyze-string select="normalize-space($selector)" regex=" ?([+>~ ]) ?">
+      <xsl:matching-substring>
+        <combinator>
+          <xsl:sequence select="regex-group(1)"/>
+        </combinator>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <selector>
+          <xsl:sequence select="."/>
+        </selector>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
   </xsl:function>
   
   <xsl:function name="tr:combined-selector2xpath" as="xs:string">
