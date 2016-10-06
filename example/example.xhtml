@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+      <link href="style.css" type="text/css" rel="stylesheet"/>
+    </head>
+    <body>
+      
+      <dl>
+        <dt>.class</dt>
+        <dd class="red">red</dd>
+      </dl>
+      <dl>
+        <dt>#id</dt>
+        <dd><span id="green">green</span></dd>
+      </dl>
+      <dl>
+        <dt>*</dt>
+        <dd>bold (font-weight:bold)</dd>
+      </dl>
+      <dl>
+        <dt>element</dt>
+        <dd><span>span</span> (blue)</dd>
+      </dl>
+      <dl>
+        <dt>element1~element2</dt>
+        <dd><a>a </a><span>span preceded by a element (green)</span></dd>
+      </dl>
+      <dl>
+        <dt>[attribute]</dt>
+        <dd title="">title (font-style:italic)</dd>
+      </dl>
+      <dl>
+        <dt>[attribute=value]</dt>
+        <dd title="hurz">hurz (text-transform:uppercase)</dd>
+      </dl>
+      <dl>
+        <dt>[attribute~=value]</dt>
+        <dd title="foo bar">bar (letter-spacing: 0.3em)</dd>
+      </dl>
+      <dl>
+        <dt>[attribute|=value]</dt>
+        <dd><span lang="de">german</span> <span lang="en">english</span> (monospace font)</dd>
+      </dl>
+      <dl>
+        <dt>[attribute^=value]</dt>
+        <dd><a href="http://www.google.de">a[href^="http"]</a> (italic)</dd>
+      </dl>
+      <dl>
+        <dt>[attribute$=value]</dt>
+        <dd><a href="http://bla.blub/filename.pdf">a[href$=".pdf"]</a> (cursive font)</dd>
+      </dl>
+      <dl>
+        <dt>[attribute*=le-tex]</dt>
+        <dd><a href="http://www.le-tex.de">a[href*="le-tex"]</a> (red)</dd>
+      </dl>
+      
+    </body>
+</html>

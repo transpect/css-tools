@@ -1,0 +1,25 @@
+code{font-weight:normal}
+
+.red{color:#ff0000;}
+
+#green{ color:#00ff00; }
+
+*{font-weight:bold}
+
+span{ color:#0000ff;}
+
+a~span{ color:#00ff00;}
+
+[title]{font-style:italic}
+
+[title=hurz]{text-transform:uppercase}
+
+[title~=bar]{letter-spacing:0.3em}
+
+[lang|=en]{font-family:monospace}
+
+a[href^="http"]{font-style:italic}
+
+a[href$=".pdf"]{font-family:cursive}
+
+a[href*="le-tex"]{color:#ff0000;}
