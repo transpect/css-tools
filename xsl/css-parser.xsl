@@ -237,10 +237,10 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
            to distinguish between [title~=bar] and a~span
            http://stackoverflow.com/questions/18144037/why-xslt-lookahead-pattern-is-not-worked-in-saxon-he-9-4-java
       -->
-      <xsl:analyze-string select="normalize-space($selector)" regex=" ?([a-z\-]*\[[a-z\-\s]+~=[a-z\-\s]+\]) ?">
+      <xsl:analyze-string select="normalize-space($selector)" regex=" ?([a-z\-]*\[[a-z\-\s]+[~\^\$\*]?=?[-_\s':a-zA-Z0-9]*\]) ?">
         <xsl:matching-substring>
           <selector>
-            <xsl:sequence select="regex-group(1)"/>
+            <xsl:sequence select="replace(regex-group(1), '''', '')"/>
           </selector>
         </xsl:matching-substring>
         <xsl:non-matching-substring>
