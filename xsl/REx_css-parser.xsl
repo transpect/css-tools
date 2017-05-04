@@ -30,7 +30,12 @@
       <xsl:variable name="extracted-css">
 				<xsl:apply-templates select="html:html/html:head/(html:link[@rel eq 'stylesheet'] union html:style)" mode="extract-css" />
 			</xsl:variable>
-			<xsl:apply-templates select="$extracted-css" mode="post-process" /> 
+      <xsl:variable name="post-processed-css">
+  			<xsl:apply-templates select="$extracted-css" mode="post-process">
+			   <xsl:with-param name="origin" select="resolve-uri(html:html/html:head/html:link[@rel eq 'stylesheet']/@href, $base-uri)" tunnel="yes"/>
+	   		</xsl:apply-templates> 
+      </xsl:variable>
+      <xsl:apply-templates select="$post-processed-css" mode="add-position"/>
     </css>
   </xsl:template>
 
@@ -189,7 +194,9 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   </xsl:template>
   
   <xsl:template match="*:rule" mode="post-process">
+    <xsl:param name="origin" tunnel="yes"/>
     <xsl:element name="{if (descendant::*:atrule) then 'atrule' else 'ruleset'}" namespace="http://www.w3.org/1996/css">
+      <xsl:attribute name="origin" select="$origin  "/>
       <xsl:if test="descendant::*:atrule">
         <xsl:attribute name="type" select="descendant::*:atrule/*:IDENT"/>
       </xsl:if>
@@ -313,6 +320,10 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   
   <xsl:template match="*:COMMA" mode="post-process">
       <xsl:text>|</xsl:text>
+  </xsl:template>
+  
+  <xsl:template match="*:selector" mode="post-process">
+    <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
   <!--
