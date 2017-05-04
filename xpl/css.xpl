@@ -19,8 +19,9 @@
       <p:documentation>an XHTML document</p:documentation>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="../xsl/css-parser.xsl"/>
-      <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only</p:documentation>
+      <p:document href="../xsl/REx_css-parser.xsl"/>
+      <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only or if you want to use the 
+        oldschool regex-based parser</p:documentation>
     </p:input>
     <p:output port="result" primary="true">
       <p:documentation>XML representation of the CSS. See css:expand</p:documentation>
@@ -67,8 +68,9 @@
       <p:documentation>an XHTML document</p:documentation>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="../xsl/css-parser.xsl"/>
-      <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only</p:documentation>
+      <p:document href="../xsl/REx_css-parser.xsl"/>
+      <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only or if you want to use the 
+        oldschool regex-based parser</p:documentation>
     </p:input>
     <p:output port="result" primary="true">
       <p:documentation>an XHTML document with CSSa attributes (in addition to its style elements/attributes/linked CSS
