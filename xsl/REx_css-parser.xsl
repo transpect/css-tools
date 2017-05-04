@@ -267,9 +267,11 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
       <xsl:sequence select="if (preceding::*[1]/descendant-or-self::*:IDENT) 
                           then '['
                           else '*['"/>
-    <xsl:text>@class='</xsl:text>
-    <xsl:value-of select="*:IDENT"/>  
-    <xsl:text>']</xsl:text>
+      <xsl:text>matches(@class</xsl:text>
+      <xsl:text>,'(^|\s)</xsl:text>
+      <xsl:value-of select="*:IDENT"/>  
+      <xsl:text>(\s|$)')</xsl:text>
+      <xsl:text>]</xsl:text>
   </xsl:template>
   
     <xsl:template match="*:simple_selector_sequence/*:universal" mode="post-process">
