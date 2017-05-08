@@ -187,7 +187,10 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
 
   <!-- mode post-process -->
   
-  <xsl:template match="*:S |*:TOKEN[matches(.,'[\{\[}\]\};]')]| *:atrule" mode="post-process"/>
+  <xsl:template match="*:S | *:atrule | *:COMMENT
+                       |*:TOKEN[matches(.,'[\{\[}\]\};]')]
+                       | *:simple_atrule[not(matches(string-join(*:TOKEN,'') , 'import'))]
+                       | *:mediaquery" mode="post-process"/>
   
   <xsl:template match="*:css" mode="post-process">
     <xsl:apply-templates mode="#current"/>
@@ -327,12 +330,18 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <xsl:template match="*:selector" mode="post-process">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
-  
-  <!--
- <xsl:template match="*:mediaquery" mode="post-process">
-   ?
+ 
+  <xsl:template match="*:simple_atrule[matches(string-join(*:TOKEN,'') , 'import')]" mode="post-process">
+    <xsl:param name="origin" tunnel="yes"/>
+    <xsl:variable name="imported-css" select="tr:resolve-css-file-content(replace(string-join(*:STRING,''),''&apos;',''), $origin)"/>
+    <xsl:variable name="extracted-imported-css" select="tr:extract-css($imported-css, resolve-uri(replace(string-join(*:STRING,''),''&apos;',''), $origin))"/>
+    <xsl:variable name="post-processed-css">
+      <xsl:apply-templates select="$extracted-imported-css" mode="post-process">
+        <xsl:with-param name="origin" select="resolve-uri(replace(string-join(*:STRING,''),''&apos;',''), $origin)" tunnel="yes"/>
+      </xsl:apply-templates> 
+    </xsl:variable>
+    <xsl:apply-templates select="$post-processed-css" mode="add-position"/>
   </xsl:template>
-  -->
   
   <!-- mode add-position -->
   
