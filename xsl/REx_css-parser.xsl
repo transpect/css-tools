@@ -25,17 +25,18 @@
           <xsl:message select="'Spurious base URI: ', base-uri(/*)"/>      
         </xsl:otherwise>
       </xsl:choose>
-      
-<!--      <css xmlns="http://www.w3.org/1996/css" xml:base="{base-uri(/*)}">-->
-      <xsl:variable name="extracted-css">
-				<xsl:apply-templates select="html:html/html:head/(html:link[@rel eq 'stylesheet'] union html:style)" mode="extract-css" />
-			</xsl:variable>
-      <xsl:variable name="post-processed-css">
-  			<xsl:apply-templates select="$extracted-css" mode="post-process">
-			   <xsl:with-param name="origin" select="resolve-uri(html:html/html:head/html:link[@rel eq 'stylesheet']/@href, $base-uri)" tunnel="yes"/>
-	   		</xsl:apply-templates> 
-      </xsl:variable>
-      <xsl:apply-templates select="$post-processed-css" mode="add-position"/>
+      <xsl:for-each select="html:html/html:head/html:link[@rel eq 'stylesheet']">
+        <!--      <css xmlns="http://www.w3.org/1996/css" xml:base="{base-uri(/*)}">-->
+        <xsl:variable name="extracted-css">
+          <xsl:apply-templates select="current()/ancestor::html:head/(html:link[@rel eq 'stylesheet'] union html:style)" mode="extract-css" />
+        </xsl:variable>
+        <xsl:variable name="post-processed-css">
+          <xsl:apply-templates select="$extracted-css" mode="post-process">
+            <xsl:with-param name="origin" select="resolve-uri(current()/@href, $base-uri)" tunnel="yes"/>
+          </xsl:apply-templates> 
+        </xsl:variable>
+        <xsl:apply-templates select="$post-processed-css" mode="add-position"/>
+      </xsl:for-each>
     </css>
   </xsl:template>
 
