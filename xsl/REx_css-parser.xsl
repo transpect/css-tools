@@ -25,18 +25,11 @@
           <xsl:message select="'Spurious base URI: ', base-uri(/*)"/>      
         </xsl:otherwise>
       </xsl:choose>
-      <xsl:for-each select="html:html/html:head/html:link[@rel eq 'stylesheet']">
         <!--      <css xmlns="http://www.w3.org/1996/css" xml:base="{base-uri(/*)}">-->
         <xsl:variable name="extracted-css">
-          <xsl:apply-templates select="current()/ancestor::html:head/(html:link[@rel eq 'stylesheet'] union html:style)" mode="extract-css" />
+          <xsl:apply-templates select="html:html/html:head/(html:link[@rel eq 'stylesheet'] union html:style)" mode="extract-css" />
         </xsl:variable>
-        <xsl:variable name="post-processed-css">
-          <xsl:apply-templates select="$extracted-css" mode="post-process">
-            <xsl:with-param name="origin" select="resolve-uri(current()/@href, $base-uri)" tunnel="yes"/>
-          </xsl:apply-templates> 
-        </xsl:variable>
-        <xsl:apply-templates select="$post-processed-css" mode="add-position"/>
-      </xsl:for-each>
+      <xsl:sequence select="$extracted-css"/>
     </css>
   </xsl:template>
 
@@ -85,9 +78,17 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <xsl:template match="html:link[@type eq 'text/css']" mode="extract-css" as="element(*)*">
     <xsl:variable name="external-css" as="xs:string?"
       select="tr:resolve-css-file-content(@href, $base-uri)"/>
-    <xsl:sequence select="if($external-css)
-                          then tr:extract-css($external-css, resolve-uri(@href, $base-uri))
-                          else ()"/>
+    <xsl:variable name="extracted-css">
+      <xsl:sequence select="if($external-css)
+                           then tr:extract-css($external-css, resolve-uri(@href, $base-uri))
+                           else ()"/>
+    </xsl:variable>
+      <xsl:variable name="post-processed-css">
+          <xsl:apply-templates select="$extracted-css" mode="post-process">
+            <xsl:with-param name="origin" select="resolve-uri(@href, $base-uri)" tunnel="yes"/>
+          </xsl:apply-templates> 
+        </xsl:variable>
+        <xsl:apply-templates select="$post-processed-css" mode="add-position"/>
   </xsl:template>
 
   <xsl:template match="html:style" mode="extract-css">
@@ -221,11 +222,11 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
             <xsl:attribute name="property" select="$property"/>
             <xsl:attribute name="value" select="current()"/>
             <xsl:variable name="css-url-regex" select="'.*?url\(''?(.+?)''?\).*'" as="xs:string"/>
-            <xsl:for-each select="current()/*:URL">
+            <xsl:if test="matches(current(), $css-url-regex) or current()/descendant::*:URL">
               <xsl:element name="resource">
                 <xsl:attribute name="src" select="resolve-uri(replace(current(),$css-url-regex,'$1'), $base-uri)"/>
               </xsl:element>
-            </xsl:for-each>
+            </xsl:if>
           </xsl:element>
         </xsl:otherwise>
       </xsl:choose>
