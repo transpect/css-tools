@@ -1,11 +1,11 @@
 css      ::= ( (  rule | simple_atrule | mediaquery | COMMENT) S* )*
 simple_atrule  ::= ('@charset'|'@import'|'@namespace') S+ (STRING|IDENT)  ';' 
-rule     ::= selectors_group S? '{' S? (COMMENT? declaration ( ';' S? declaration)* ';'? S?)* COMMENT*  '}'
+rule     ::= selectors_group S? '{' S? (COMMENT? declaration ( S? ';' S? declaration)* ';'? S?)* COMMENT*  '}'
 mediaquery ::= mediarule S? '{' S? COMMENT* query_declaration ( S? COMMENT* query_declaration)* S? '}'
 query_declaration ::= rule
 declaration ::=  property S? ':'  (property ':')* S? values 
 selectors_group
-         ::= selector ( COMMA S* selector )*  
+         ::= selector ( COMMENT? COMMA S* selector )*  
 selector ::= simple_selector_sequence ( combinator simple_selector_sequence )*
 mediaquery_selector::= '(' declaration ')'
 combinator
@@ -105,7 +105,7 @@ COMMA    ::= w ','
 TILDE    ::= w '~'
 NOT      ::= ':' N O T '('
 DIMENSION ::= '-'?num S? ('em' | 'px' | 'fr' | 'cm' | 'mm' | 'in' | 'pt' | 'pc'|'vh')
-COMMENT ::= S* '/*' S? (nmchar|':'|';'|','|S|'='|string|'('|')'|'#'|"'"|'"'|)+ S? '*/' S?
+COMMENT ::= S* '/*' S? (nmchar|':'|';'|','|S|'='|string|'('|')'|'#'|"'"|'"'|'/'|'.'|'!'|'?')+ S? '*/' S?
 one-to-six-hex-digits
          ::= [0-9a-fA-F]
            | [0-9a-fA-F] [0-9a-fA-F]
