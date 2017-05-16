@@ -108,7 +108,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <xsl:variable name="css:pseudo-classes-regex" select="':(first-child|last-child|link|visited|hover|active|focus|lang|first-line|first-letter|before|after)'" as="xs:string"/>
 
   <xsl:function name="tr:resolve-attributes" as="xs:string">
-    <xsl:param name="var-resolve-attributes" />
+    <xsl:param name="var-resolve-attributes" as="element(attrib)" />
     <xsl:variable name="quots">"</xsl:variable>
     <xsl:variable name="attribute" select="$var-resolve-attributes/*:IDENT[1][preceding-sibling::*[1][self::*:TOKEN[matches(.,'\[')]]]"/>
     <xsl:variable name="value" select="replace($var-resolve-attributes/*[following-sibling::*[1][self::TOKEN[matches(.,'\]')]]],$quots,'')"/>
@@ -163,7 +163,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
           <xsl:text>')</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="."/>
+          <xsl:value-of select="$var-resolve-attributes"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -315,7 +315,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   </xsl:template>
   
   <!--  reorder simple_selector_sequence according to it's xpath (e.g. combinator ' ' in ancestor::)-->
-  <xsl:template match="*:selector[*:combinator[matches(descendant::text(),' |~')]]" mode="post-process">
+  <xsl:template match="*:selector[*:combinator[matches(.,' |~')]]" mode="post-process">
     <xsl:param name="condition" tunnel="yes"/>
     <xsl:apply-templates  select="*:simple_selector_sequence[preceding-sibling::*:combinator]" mode="#current">
     </xsl:apply-templates>
