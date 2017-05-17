@@ -14,8 +14,8 @@ combinator
            | TILDE 
     /* ws: explicit */
 simple_selector_sequence
-         ::= type_selector ( HASH | class | attrib | pseudo /* | negation | atrule | mediaquery_selector */ )*
-           | ( HASH | class | attrib | pseudo /*| negation | atrule| mediaquery_selector */ )+
+         ::= type_selector ( HASH | class | attrib | pseudo | negation | atrule | mediaquery_selector )*
+           | ( HASH | class | attrib | pseudo | negation | atrule| mediaquery_selector )+
     /* ws: explicit */
 type_selector
          ::= namespace_prefix? ( element_name | '*' )
