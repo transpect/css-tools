@@ -156,6 +156,9 @@
           CSSa.</p:documentation>
       </p:pipe>
     </p:output>
+    <p:output port="report" sequence="true">
+      <p:pipe port="report" step="parse"/>
+    </p:output>
 
     <p:option name="path-constraint" required="false" select="''">
       <p:documentation>a predicate for matching only specific nodes, e.g., '[parent::*:tr]' for expanding only HTML table cell attributes</p:documentation>
