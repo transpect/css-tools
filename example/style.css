@@ -20,6 +20,9 @@ a~span{ color:#00ff00;}
 
 a[href^="http"]{font-style:italic}
 
-a[href$=".pdf"]{font-family:cursive}
+a[href$=".pdf"]{
+  font-family:cursive;
+  background-image: url(#relative) /* non-sensical, just for demoing URLs without quotes, but with fragment identifiers */ 
+}
 
 a[href*="le-tex"]{color:#ff0000;}

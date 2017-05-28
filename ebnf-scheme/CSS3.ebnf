@@ -50,7 +50,7 @@ STRING   ::= '"' STRING_CONTENT1 '"' | "'" STRING_CONTENT2 "'"
 
 <?TOKENS?>
 EOF      ::= $
-URL       ::= 'url(' ("'"|#x0027|nmchar|'/'|'.')+ ')'
+URL       ::= 'url(' ("'"|[\#]|#x0027|nmchar|'/'|'.')+ ')'
 important ::= S '!important'
 ident    ::= [-]? nmstart nmchar*
 name     ::= nmchar+

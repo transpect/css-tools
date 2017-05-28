@@ -232,10 +232,17 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
 
   <!-- mode post-process -->
   
-  <xsl:template match="S | atrule | COMMENT
+  <xsl:template match="S | atrule 
                        | TOKEN[matches(.,'[\{\[}\]\};]')]
                        | simple_atrule[not(TOKEN[1] = '@import')]
                        | mediaquery" mode="post-process"/>
+  
+  <xsl:template match="COMMENT" mode="post-process">
+    <comment xmlns="http://www.w3.org/1996/css">
+      <xsl:attribute name="xml:space" select="'preserve'"/>
+      <xsl:value-of select="."/>
+    </comment>
+  </xsl:template>
   
   <xsl:template match="parser-results" mode="post-process">
     <!-- Note that this css element is in a different namespace than the css element that comes out of expand-css -->
