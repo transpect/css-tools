@@ -577,16 +577,12 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </xsl:for-each>
   </xsl:template>
 
-  <!-- mode add-position -->
+  <!-- mode add-position (post-process is included here only for compatibility with the REx-based parser) -->
   
-  <xsl:template match="*" mode="add-position">
+  <xsl:template match="* | @*" mode="add-position post-process">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()" mode="#current" />
     </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="@*" mode="add-position">
-    <xsl:copy-of select="." />
   </xsl:template>
 
   <xsl:template match="*:selector" mode="add-position">

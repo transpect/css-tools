@@ -34,15 +34,10 @@
 
       <xsl:for-each select="ruleset[declaration]/selector">
         <xsl:variable name="current-node" select="." />
-        <xsl:variable name="class-attribute" select="if (matches(., '@class')) then replace(replace(., '.+?(\[matches\(@class,.\(\^\|\\s\)(.+?)\(\\s\|\$\))?', '$2 '), '\s+', ' ') else ''" />
-        <xsl:variable name="leading-zero" select="if (string-length(@position) eq 1) then '000' else 
-                                                  if (string-length(@position) eq 2) then '00' else 
-                                                  if (string-length(@position) eq 3) then '0' else ''" />
+        <xsl:variable name="leading-zero" as="xs:string"
+          select="string-join(for $i in (string-length(@position) to 3) return '0', '')"/>
         <xslout:template match="{.}{$path-constraint}" 
           priority="{number(concat(replace(@priority, ',', ''), '.', $leading-zero, @position))}" mode="add-css-info">
-          <xslout:param name="last-pos" tunnel="yes">0</xslout:param>
-          <xslout:variable name="class" select="'{normalize-space($class-attribute)}'" />
-          <xslout:variable name="pos" select="index-of(tokenize(@class, ' '), $class)" />
           <xslout:copy>
             <xslout:apply-templates select="@*" mode="#current" />
             <xsl:for-each select="../declaration">
@@ -75,12 +70,10 @@
               </xsl:if>
             </xsl:for-each>
             <xslout:variable name="more-attributes">
-              <xslout:next-match>
-                <xslout:with-param name="last-pos" select="$pos" />
-              </xslout:next-match>
+              <xslout:next-match/>
             </xslout:variable>
             <xslout:copy-of select="$more-attributes/*[1]/@*[not(contains('{for $i in $current-node/../declaration/@property return concat($i, if ($i/parent::*/@important='yes') then '_important' else '')}', local-name()))]" />
-            <xslout:apply-templates select="node()" mode="#current" />
+            <xslout:apply-templates mode="#current" />
           </xslout:copy>
         </xslout:template>
       </xsl:for-each>

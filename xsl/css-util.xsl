@@ -19,23 +19,23 @@
     <xsl:param name="origin" tunnel="yes" as="xs:string?"/>
     <xsl:for-each select="tokenize($raw-declarations, ';\s*')[matches(., '\S')]">
       <xsl:variable name="prop" select="normalize-space(substring-before(., ':'))" />
-      <xsl:variable name="val" select="replace(normalize-space(substring-after(., ':')), '\s?!important', '')" />
+      <xsl:variable name="_val" select="replace(normalize-space(substring-after(., ':')), '\s?!important', '')" />
       <xsl:variable name="check-shorthand-property" select="$prop=$css-shorthand-properties" as="xs:boolean" />
       <xsl:choose>
         <xsl:when test="$check-shorthand-property">
-          <shorthand property="{$prop}" value="{$val}" num="{position()}"/>
-          <xsl:sequence select="tr:handle-shorthand-properties($prop, $val, string(position()))" />
+          <shorthand property="{$prop}" value="{$_val}" num="{position()}"/>
+          <xsl:sequence select="tr:handle-shorthand-properties($prop, $_val, string(position()))" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:element name="declaration" xmlns="http://www.w3.org/1996/css">
             <xsl:attribute name="property" select="$prop"/>
-            <xsl:attribute name="value" select="$val"/>
+            <xsl:attribute name="value" select="$_val"/>
             <xsl:if test="matches(substring-after(., ':'), '!important')">
               <xsl:attribute name="important" select="'yes'"/>
             </xsl:if>
             <xsl:variable name="atts" as="element(atts)">
               <atts>
-                <xsl:analyze-string select="$val" regex=".*?(url|format)\s*\(\s*'?([^\)]+?)'?\s*\)(\s*,)?">
+                <xsl:analyze-string select="$_val" regex=".*?(url|format)\s*\(\s*'?([^\)]+?)'?\s*\)(\s*,)?">
                   <xsl:matching-substring>
                     <att xmlns="" name="{regex-group(1)}" val="{regex-group(2)}"/>
                     <xsl:if test="normalize-space(regex-group(3))">
@@ -300,5 +300,6 @@
     </xsl:for-each>
   </xsl:template>
 
-
+  <xsl:key name="class" match="*[@class]" use="tokenize(@class, '\s+')"/>
+  <xsl:key name="id" match="*[@id]" use="@id"/>
 </xsl:stylesheet>

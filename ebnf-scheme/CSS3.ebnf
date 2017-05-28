@@ -1,71 +1,58 @@
-css      ::= ( (  rule | simple_atrule | mediaquery )  )*
-simple_atrule  ::= ('@charset'|'@import'|'@namespace')  (STRING|IDENT)  ';' 
-rule     ::= selectors_group '{'   ( declaration (  ';'  declaration)* ';'? )* '}'
-mediaquery ::= mediarule  '{'   query_declaration (  query_declaration)*  '}'
+css      ::= S* ( (  rule | simple_atrule | mediaquery | COMMENT) S* )*
+simple_atrule  ::= ('@charset'|'@import'|'@namespace') S+ STRING S* ';' 
+rule     ::= selectors_group S? '{' S? (COMMENT? declaration ( S? ';' S? declaration)* ';'? S?)* COMMENT*  '}'
+mediaquery ::= mediarule S? '{' S? COMMENT* query_declaration ( S? COMMENT* query_declaration)* S? '}'
 query_declaration ::= rule
-declaration ::=  property  ':'  (property ':')*  values 
+declaration ::=  property S? ':'  (property ':')* S? values 
 selectors_group
-         ::= selector   (  COMMA  selector )*  
-selector ::= simple_selector_sequence  ( combinator? simple_selector_sequence)*
+         ::= selector ( COMMENT? COMMA S* selector )*  
+selector ::= simple_selector_sequence ( combinator simple_selector_sequence )*
 mediaquery_selector::= '(' declaration ')'
 combinator
-         ::= PLUS 
-           | GREATER 
-           | TILDE 
-    /* ws: explicit */
+         ::= PLUS S*
+           | GREATER S*
+           | TILDE S*
+           | S+
 simple_selector_sequence
-         ::= type_selector ( HASH | class | attrib | pseudo | negation | atrule | mediaquery_selector )*
+         ::= ( type_selector | universal ) ( HASH | class | attrib | pseudo | negation | atrule | mediaquery_selector )*
            | ( HASH | class | attrib | pseudo | negation | atrule| mediaquery_selector )+
-    /* ws: explicit */
 type_selector
-         ::= namespace_prefix? ( element_name | '*' )
-    /* ws: explicit */
+         ::= namespace_prefix? element_name
 namespace_prefix
          ::= ( IDENT | '*' )? '|'
-    /* ws: explicit */
 element_name
          ::= IDENT
-    /* ws: explicit */
+universal
+         ::= namespace_prefix? '*'
 class    ::= '.' IDENT
-    /* ws: explicit */
-mediarule ::= '@media'  conditions (  conditions|   mediaquery_selector )*
+mediarule ::= '@media' S conditions ( S? conditions| S?  mediaquery_selector )*
 atrule  ::= '@' IDENT
-    /* ws: explicit */
 conditions ::=  ('and'|'screen'|'or'|'only'|'not'|'amzn-mobi'|'amzn-kf8'|',') 
-attrib   ::= '['  namespace_prefix? IDENT  ( ( PREFIXMATCH  | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH )  ( IDENT | STRING )  )? ']'
-    /* ws: explicit */
+attrib   ::= '[' S* namespace_prefix? IDENT S* ( ( PREFIXMATCH  | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH ) S* ( IDENT | STRING ) S* )? ']'
 pseudo   ::= ':' ':'? ( IDENT | functional_pseudo )
-    /* ws: explicit */
 functional_pseudo
-         ::= FUNCTION  expression ')'
-    /* ws: explicit */
+         ::= FUNCTION S* expression ')'
 
 property ::= ( STRING | IDENT )
-values ::= value ( value | '/' value )* important?
-value ::= ( URL | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | STRING | IDENT | COMMA | functional_pseudo) /*(COMMA  IDENT)?*/
-  /* ws: explicit */
-expression     ::= ( ( PLUS | PERCENTAGE | URL | HEX | '-' | DIMENSION  | NUMBER | STRING | IDENT | COMMA)  )+
-negation ::= NOT  negation_arg  ')'
-    /* ws: explicit */
+values ::= value (S value | '/' value )* ( S* COMMA S* value (S value | '/' value )* )* important?
+value ::= ( URL | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | STRING | IDENT | functional_pseudo) 
+expression     ::= ( ( PLUS | PERCENTAGE | URL | HEX | '-' | DIMENSION  | NUMBER | STRING | IDENT | COMMA) S* )+
+negation ::= NOT S* negation_arg S* ')'
 negation_arg
          ::= type_selector
+           | universal
            | HASH
            | class
            | attrib
            | pseudo
-    /* ws: explicit */
-
-Ignore ::= S^WS | COMMENT 
-   /* ws: definition */
-COMMENT ::=  '/*' CommentContents '*/' 
+           
+STRING   ::= '"' STRING_CONTENT1 '"' | "'" STRING_CONTENT2 "'"
 
 <?TOKENS?>
 EOF      ::= $
 URL       ::= 'url(' ("'"|#x0027|nmchar|'/'|'.')+ ')'
-    /* ws: explicit */
-important ::=  '!important'
+important ::= S '!important'
 ident    ::= [-]? nmstart nmchar*
-  /* ws: explicit */
 name     ::= nmchar+
 nmstart  ::= [_a-zA-Z]
            | nonascii
@@ -79,14 +66,13 @@ nmchar   ::= [_a-zA-Z0-9#x2D]
            | escape
 num      ::= [0-9]+
            | [0-9]* '.' [0-9]+
-string   ::= string1
-           | string2
-string1  ::= '"' ( [^#x000A#x000D#x000C\"] | '\' nl | nonascii | escape )* '"'
-string2  ::= "'" ( [^#x000A#x000D#x000C\'] | '\' nl | nonascii | escape )* "'"
 nl       ::= #x000A
            | #x000D #x000A
            | #x000D
            | #x000C
+STRING_CONTENT1 ::= ( [^#x000A#x000D#x000C\"] | '\' nl | nonascii | escape )*
+STRING_CONTENT2 ::= ( [^#x000A#x000D#x000C\'] | '\' nl | nonascii | escape )*
+w        ::= [ #x0009#x000D#x000A#x000C]*
 N        ::= 'n'
            | '\' zero-to-four-zeroes ( '4e' | '6e' ) ( #x000D #x000A | [ #x0009#x000D#x000A#x000C] )?
            | '\n'
@@ -96,8 +82,7 @@ O        ::= 'o'
 T        ::= 't'
            | '\' zero-to-four-zeroes ( '54' | '74' ) ( #x000D #x000A | [ #x0009#x000D#x000A#x000C] )?
            | '\t'
-S        ::= ( #x0020 | #x0009 | #x000D | #x000A )+
-SPACE    ::= #x0020
+S        ::= [ #x0009#x000D#x000A#x000C]+
 INCLUDES ::= '~='
 DASHMATCH
          ::= '|='
@@ -108,28 +93,18 @@ SUFFIXMATCH
 SUBSTRINGMATCH
          ::= '*='
 IDENT    ::= ident
-STRING   ::= string
 FUNCTION ::= ident '('
 NUMBER   ::= '-'?num
 HASH     ::= '#' name
 HEX      ::= '#' one-to-six-hex-digits
 PERCENTAGE ::= num '%'
-PLUS     ::= '+'
-GREATER  ::= '>'
-COMMA    ::= ','
-TILDE    ::= '~'
+PLUS     ::= w '+'
+GREATER  ::= w '>'
+COMMA    ::= w ','
+TILDE    ::= w '~'
 NOT      ::= ':' N O T '('
-DIMENSION ::= '-'?num  ('em' | 'px' | 'fr' | 'cm' | 'mm' | 'in' | 'pt' | 'pc'|'vh')
-Char     ::= #x0009
-           | #x000A
-           | #x000D
-           | [#x0020-#xD7FF]
-           | [#xE000-#xFFFD]
-           | [#x10000-#x10FFFF]
-CommentContents
-         ::=( ( Char+ - ( Char* ( '/*' | '*/' ) Char* ) ) - ( Char* '/' ) ) &'*'
-           | ( Char+ - ( Char* ( '/*' | '*/' ) Char* ) ) &'*/'
-
+DIMENSION ::= '-'?num S? ('em' | 'px' | 'fr' | 'cm' | 'mm' | 'in' | 'pt' | 'pc'|'vh')
+COMMENT ::= S* '/*' S? (nmchar|':'|';'|','|S|'='|'('|')'|'#'|"'"|'"'|'/'|'.'|'!'|'?')+ S? '*/' S?
 one-to-six-hex-digits
          ::= [0-9a-fA-F]
            | [0-9a-fA-F] [0-9a-fA-F]

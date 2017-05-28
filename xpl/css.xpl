@@ -12,50 +12,123 @@
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://transpect.io/xproc-util/store-debug/xpl/store-debug.xpl"/>
 	<p:import href="http://transpect.io/xproc-util/file-uri/xpl/file-uri.xpl"/>
-
+  <p:import href="http://transpect.io/xproc-util/simple-progress-msg/xpl/simple-progress-msg.xpl"/>
+  
   <p:declare-step type="css:parse" name="parse">
-    
+
+    <p:documentation>In order to invoke this step directly with Calabash, you need to specify -l css-tools/xpl/css.xpl and
+    -s {http://www.w3.org/1996/css}parse</p:documentation>
+
     <p:input port="source" primary="true">
       <p:documentation>an XHTML document</p:documentation>
     </p:input>
     <p:input port="stylesheet">
       <p:document href="../xsl/REx_css-parser.xsl"/>
-      <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only or if you want to use the 
+      <p:documentation>a stylesheet that can be overridden, e.g. if CSS2.1 features are wanted only or if you want to use the 
         oldschool regex-based parser</p:documentation>
     </p:input>
     <p:output port="result" primary="true">
       <p:documentation>XML representation of the CSS. See css:expand</p:documentation>
     </p:output>
-    
+    <p:output port="report" sequence="true">
+      <p:pipe port="report" step="apply-parsing-xsl"/>
+    </p:output>
+
     <p:option name="debug" required="false" select="'no'"/>
     <p:option name="debug-dir-uri" required="false" select="resolve-uri('debug')"/>
-  	
-  	<tr:file-uri name="base-uri">
-  		<p:documentation>
-  			Calculate base-uri
-  		</p:documentation>
-  		<p:with-option name="filename" select="(base-uri(/*), static-base-uri())[1]">
-  			<p:pipe port="source" step="parse"/>
-  		</p:with-option>
-  	</tr:file-uri>
-  	
-    <p:xslt name="parsing-xsl">
-      <p:input port="parameters">
-        <p:empty/>
-      </p:input>
-      <p:input port="stylesheet">
-        <!--<p:document href="../xsl/css-parser.xsl"/>-->
-        <p:pipe port="stylesheet" step="parse"/>
-      </p:input>
-    	<p:input port="source">
-    		<p:pipe port="source" step="parse"/>
-    	</p:input>
-    	<p:with-param name="base-uri" select="/c:result/@local-href">
-    		<p:pipe port="result" step="base-uri"/>
-    	</p:with-param>
-    </p:xslt>
+    <p:option name="status-dir-uri" required="false" select="resolve-uri('status')"/>
+
+    <tr:file-uri name="base-uri">
+      <p:documentation> Calculate base-uri </p:documentation>
+      <p:with-option name="filename" select="(base-uri(/*), static-base-uri())[1]">
+        <p:pipe port="source" step="parse"/>
+      </p:with-option>
+    </tr:file-uri>
+
+    <p:try name="apply-parsing-xsl">
+      <p:documentation>First try parsing with comments, then try parsing without comments. Parsing with comments
+      will fail if comments are located in selectors or properties.</p:documentation>
+      <p:group>
+        <p:output port="result" primary="true"/>
+        <p:output port="report" sequence="true">
+          <p:inline><c:ok/></p:inline>
+        </p:output>
+        <p:xslt name="apply-parsing-xsl-with-comments">
+          <p:input port="parameters"><p:empty/></p:input>
+          <p:input port="stylesheet">
+            <p:pipe port="stylesheet" step="parse"/>
+          </p:input>
+          <p:input port="source">
+            <p:pipe port="source" step="parse"/>
+          </p:input>
+          <p:with-param name="base-uri" select="/c:result/@local-href">
+            <p:pipe port="result" step="base-uri"/>
+          </p:with-param>
+          <p:with-param name="remove-comments" select="'no'"/>
+        </p:xslt>
+        <tr:store-debug pipeline-step="css-expand/css.1.parse-try">
+          <p:with-option name="active" select="$debug"/>
+          <p:with-option name="base-uri" select="$debug-dir-uri"/>
+        </tr:store-debug>
+      </p:group>
+      <p:catch name="catch">
+        <p:output port="result" primary="true"/>
+        <p:output port="report" sequence="true">
+          <p:pipe port="result" step="info"/>
+        </p:output>
+
+        <tr:propagate-caught-error name="propagate" msg-file="css-parsing-error.txt" code="tr:CSS01" severity="warning">
+          <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+          <p:input port="source">
+            <p:pipe port="error" step="catch"/>
+          </p:input>
+        </tr:propagate-caught-error>
+        
+        <p:insert position="last-child" match="/c:errors" name="info">
+          <p:input port="insertion">
+            <p:inline>
+              <c:error code="tr:CSS02" type="info">Reverting to CSS parsing with all comments removed. You can try to
+              help the parser by moving comments from selectors and properties outside the rules.</c:error>
+            </p:inline>
+          </p:input>
+        </p:insert>
+
+        <p:sink/>
+
+        <p:xslt name="apply-parsing-xsl-without-comments">
+          <p:input port="parameters">
+            <p:empty/>
+          </p:input>
+          <p:input port="stylesheet">
+            <p:pipe port="stylesheet" step="parse"/>
+          </p:input>
+          <p:input port="source">
+            <p:pipe port="source" step="parse"/>
+          </p:input>
+          <p:with-param name="base-uri" select="/c:result/@local-href">
+            <p:pipe port="result" step="base-uri"/>
+          </p:with-param>
+          <p:with-param name="remove-comments" select="'yes'"/>
+        </p:xslt>
+      </p:catch>
+    </p:try>
     
     <tr:store-debug pipeline-step="css-expand/css.1.parse">
+      <p:with-option name="active" select="$debug"/>
+      <p:with-option name="base-uri" select="$debug-dir-uri"/>
+    </tr:store-debug>
+    
+    <p:xslt name="post-process" initial-mode="post-process">
+      <p:input port="parameters"><p:empty/></p:input>
+      <p:input port="stylesheet">
+        <p:pipe port="stylesheet" step="parse"/>
+      </p:input>
+      <p:with-param name="base-uri" select="/c:result/@local-href">
+        <p:pipe port="result" step="base-uri"/>
+      </p:with-param>
+    </p:xslt>
+    
+    <tr:store-debug pipeline-step="css-expand/css.2.xml-representation">
       <p:with-option name="active" select="$debug"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
     </tr:store-debug>
@@ -68,9 +141,9 @@
       <p:documentation>an XHTML document</p:documentation>
     </p:input>
     <p:input port="stylesheet">
+      <!--<p:document href="../xsl/css-parser.xsl"/>-->
       <p:document href="../xsl/REx_css-parser.xsl"/>
-      <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only or if you want to use the 
-        oldschool regex-based parser</p:documentation>
+      <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only</p:documentation>
     </p:input>
     <p:output port="result" primary="true">
       <p:documentation>an XHTML document with CSSa attributes (in addition to its style elements/attributes/linked CSS
@@ -113,7 +186,7 @@
       </p:input>
     </p:xslt>
 
-    <tr:store-debug pipeline-step="css-expand/css.2.create-xsl" extension="xsl">
+    <tr:store-debug pipeline-step="css-expand/css.4.create-xsl" extension="xsl">
       <p:with-option name="active" select="$debug"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
     </tr:store-debug>
@@ -132,7 +205,7 @@
       </p:input>
     </p:xslt>
 
-    <tr:store-debug pipeline-step="css-expand/css.3.expanded">
+    <tr:store-debug pipeline-step="css-expand/css.5.expanded">
       <p:with-option name="active" select="$debug"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
     </tr:store-debug>
