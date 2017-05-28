@@ -338,7 +338,6 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   </xsl:template>
   
   <xsl:template match="attrib" mode="post-process">
-    <xsl:message select="'AAAAAAAAAAA ',tr:resolve-attributes(.)"></xsl:message>
     <xsl:text>[</xsl:text>
     <xsl:sequence select="tr:resolve-attributes(.)"/>
     <xsl:text>]</xsl:text>
@@ -364,7 +363,6 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <xsl:template match="simple_selector_sequence" mode="post-process">
     <xsl:variable name="elements" select="universal | type_selector" as="element(*)*"/>
     <xsl:variable name="attribs" select="attrib" as="element(attrib)*"/>
-    <xsl:message select="'aaaaaaaaa ', $attribs"></xsl:message>
     <xsl:variable name="other-conditions" select="class | HASH | pseudo" as="element(*)*"/>
     <xsl:apply-templates select="$elements" mode="#current"/>
     <xsl:if test="empty($elements)">
