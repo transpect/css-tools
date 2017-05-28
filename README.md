@@ -141,7 +141,7 @@ The purpose of expansion is to find out the actual styling that is applied to a 
 
 ## Rationale for switching to an EBNF-based parser
 
-We wanted to be able to parse stuff like `calc()`, `scale()`, `translateX()`, `rgba()` less cumbersome than with regexes. 
+We wanted to be able to parse stuff like `calc()`, `scale()`, `translateX()`, `rgba()` in a less cumbersome way than with regexes. 
 
 ## Comments and whitespace
 
