@@ -239,6 +239,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <xsl:template match="COMMENT" mode="post-process">
     <comment>
       <xsl:attribute name="xml:space" select="'preserve'"/>
+      <xsl:copy-of select="ancestor::css[1]/@origin"/>
       <xsl:value-of select="."/>
     </comment>
   </xsl:template>
@@ -290,7 +291,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <xsl:template match="*:rule" mode="post-process">
     <xsl:param name="origin" tunnel="yes"/>
     <xsl:element name="{if (descendant::*:atrule) then 'atrule' else 'ruleset'}" namespace="http://www.w3.org/1996/css">
-      <xsl:attribute name="origin" select="$origin  "/>
+      <xsl:attribute name="origin" select="$origin"/>
       <xsl:if test="descendant::*:atrule">
         <xsl:attribute name="type" select="descendant::*:atrule/*:IDENT"/>
       </xsl:if>
