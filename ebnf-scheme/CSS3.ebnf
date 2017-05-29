@@ -1,7 +1,7 @@
 css      ::= S* ( (  rule | simple_atrule | mediaquery | COMMENT) S* )*
 simple_atrule  ::= ('@charset'|'@import'|'@namespace') S+ STRING S* ';' 
 rule     ::= selectors_group S? '{' S? (COMMENT? declaration ( S? ';' S? declaration)* ';'? S?)* COMMENT*  '}'
-mediaquery ::= mediarule S? '{' S? COMMENT* query_declaration ( S? COMMENT* query_declaration)* S? '}'
+mediaquery ::= mediarule S? '{' ( S? COMMENT* query_declaration)* S? '}'
 query_declaration ::= rule
 declaration ::=  property S? ':'  (property ':')* S? values 
 selectors_group
@@ -27,7 +27,7 @@ universal
 class    ::= '.' IDENT
 mediarule ::= '@media' S conditions ( S? conditions| S?  mediaquery_selector )*
 atrule  ::= '@' IDENT
-conditions ::=  ('and'|'screen'|'or'|'only'|'not'|'amzn-mobi'|'amzn-kf8'|',') 
+conditions ::=  ('and'|'screen'|'or'|'only'|'not'|'amzn-mobi'|'amzn-kf8'|'amzn-mobi7'|',') 
 attrib   ::= '[' S* namespace_prefix? IDENT S* ( ( PREFIXMATCH  | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH ) S* ( IDENT | STRING ) S* )? ']'
 pseudo   ::= ':' ':'? ( IDENT | functional_pseudo )
 functional_pseudo
