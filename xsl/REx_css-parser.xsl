@@ -234,25 +234,45 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   
   <xsl:template match="S | atrule 
                        | TOKEN[matches(.,'[\{\[}\]\};]')]
-                       | simple_atrule[not(TOKEN[1] = '@import')]
-                       | mediaquery" mode="post-process"/>
+                       | simple_atrule[not(TOKEN[1] = '@import')]" mode="post-process"/>
   
   <xsl:template match="COMMENT" mode="post-process">
-    <comment xmlns="http://www.w3.org/1996/css">
+    <comment>
       <xsl:attribute name="xml:space" select="'preserve'"/>
       <xsl:value-of select="."/>
     </comment>
   </xsl:template>
   
+  <xsl:template match="mediaquery" mode="post-process">
+    <atrule type="media">
+      <xsl:copy-of select="ancestor::css[1]/@origin"/>
+      <raw-css>
+        <xsl:attribute name="xml:space" select="'preserve'"/>
+        <xsl:value-of select="."/>
+      </raw-css>
+      <xsl:apply-templates mode="#current"/>
+    </atrule>
+  </xsl:template>
+
+  <xsl:template match="mediarule" mode="post-process">
+    <condition>
+      <xsl:value-of select="normalize-space(.)"/>
+    </condition>
+  </xsl:template>
+  
+  <xsl:template match="query_declaration" mode="post-process">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+
   <xsl:template match="parser-results" mode="post-process">
     <!-- Note that this css element is in a different namespace than the css element that comes out of expand-css -->
-    <css xmlns="http://www.w3.org/1996/css">
+    <css>
       <xsl:apply-templates mode="#current"/>
     </css>
   </xsl:template>
   
   <xsl:template match="simple_atrule[TOKEN[1] = '@import']" mode="post-process">
-    <atrule xmlns="http://www.w3.org/1996/css" type="import" resolved="{exists(following-sibling::*[1]/self::css)}">
+    <atrule type="import" resolved="{exists(following-sibling::*[1]/self::css)}">
       <xsl:copy-of select="ancestor::css[1]/@origin"/>
       <raw-css>
         <xsl:attribute name="xml:space" select="'preserve'"/>
@@ -355,7 +375,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   </xsl:template>
   
   <xsl:template match="selector" mode="post-process">
-    <selector xmlns="http://www.w3.org/1996/css">
+    <selector>
       <xsl:attribute name="priority" select="tr:getPriority(.)"/>
       <xsl:attribute name="position" select="count(preceding-sibling::COMMA) + 1 
                                              + sum(for $r in ../../preceding::rule return count($r/selectors_group/COMMA) + 1)"/>
@@ -499,7 +519,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
           <xsl:choose>
             <xsl:when test="count($val-seq) le 4">
               <xsl:for-each select="$new-props/*:props[number(@count) eq count($val-seq/*:value)]/*">
-                <xsl:element name="declaration" xmlns="http://www.w3.org/1996/css">
+                <xsl:element name="declaration">
                   <xsl:attribute name="property"
                     select="concat(replace($prop, '-.*$', ''), '-', name(), substring-after($prop, 'border'))"/>
                   <xsl:attribute name="value" select="$val-seq/*:value[position() eq number(current()/@seq)]"/>
@@ -551,7 +571,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
                 <xsl:otherwise/>
               </xsl:choose>
             </xsl:variable>
-            <xsl:element name="declaration" xmlns="http://www.w3.org/1996/css">
+            <xsl:element name="declaration">
               <xsl:attribute name="property" select="concat('background-', $current-val)"/>
               <xsl:attribute name="value" select="."/>
               <xsl:attribute name="shorthand" select="$id"/>
