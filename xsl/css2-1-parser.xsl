@@ -13,7 +13,8 @@
 
   <xsl:import href="REx_css-parser.xsl"/>
   
-  <!-- This variable is only there to eliminate the text-decoration property  from the $prop list -->
-  <xsl:variable name="css-shorthand-properties" select="('background', 'border', 'border-left', 'border-right', 'border-top', 'border-bottom', 'font', 'list-style', 'margin', 'padding')" as="xs:string+" />
+  <!-- This variable is only there to eliminate the text-decoration property from the $prop list -->
+  <xsl:variable name="css-shorthand-properties" select="('background', 'border', 'border-left', 'border-right', 
+    'border-top', 'border-bottom', 'font', 'list-style', 'margin', 'padding')" as="xs:string+" />
   
 </xsl:stylesheet>

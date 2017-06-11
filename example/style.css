@@ -8,11 +8,14 @@ code{font-weight:normal}
 
 span{ color:#0000ff;}
 
-a~span{ color:#00ff00;}
+a~span{ 
+  color:#aa00aa;
+  font-weight: normal  
+}
 
 [title]{font-style:italic}
 
-[title=hurz]{text-transform:uppercase}
+[title=foo]{text-transform:uppercase}
 
 [title~=bar]{letter-spacing:0.3em}
 
@@ -25,4 +28,15 @@ a[href$=".pdf"]{
   background-image: url(#relative) /* non-sensical, just for demoing URLs without quotes, but with fragment identifiers */ 
 }
 
-a[href*="le-tex"]{color:#ff0000;}
+a[href*="le-tex"]{color: black; text-decoration:underline}
+
+
+td, th {
+  border: 1px solid black;
+  padding: 4pt;
+}
+
+th {
+  text-align: left;
+  background-color: #e0e0e0;
+}

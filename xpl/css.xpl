@@ -138,15 +138,15 @@
   <p:declare-step type="css:expand" name="expand">
 
     <p:input port="source" primary="true">
-      <p:documentation>an XHTML document</p:documentation>
+      <p:documentation>An XHTML document</p:documentation>
     </p:input>
     <p:input port="stylesheet">
-      <!--<p:document href="../xsl/css-parser.xsl"/>-->
       <p:document href="../xsl/REx_css-parser.xsl"/>
-      <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only</p:documentation>
+      <p:documentation>A parsing stylesheet that can be overriden. Use ../xsl/css2-1-parser.xsl for CSS 2.1 features and
+      ../xsl/css-parser.xsl for the previous, regex-based parser.</p:documentation>
     </p:input>
     <p:output port="result" primary="true">
-      <p:documentation>an XHTML document with CSSa attributes (in addition to its style elements/attributes/linked CSS
+      <p:documentation>An XHTML document with CSSa attributes (in addition to its style elements/attributes/linked CSS
         stylesheets)</p:documentation>
     </p:output>
     <p:output port="xml-representation">
@@ -161,10 +161,12 @@
     </p:output>
 
     <p:option name="path-constraint" required="false" select="''">
-      <p:documentation>a predicate for matching only specific nodes, e.g., '[parent::*:tr]' for expanding only HTML table cell attributes</p:documentation>
+      <p:documentation>a predicate for matching only specific nodes, e.g., '[parent::*:tr]' for expanding only HTML table cell
+        attributes</p:documentation>
     </p:option>
     <p:option name="prop-constraint" required="false" select="''">
-      <p:documentation>space-separated list of property names that should be attached as css: attributes, e.g., 'width padding-top padding-bottom'</p:documentation>
+      <p:documentation>space-separated list of property names that should be attached as css: attributes, e.g., 'width
+        padding-top padding-bottom'</p:documentation>
     </p:option>
     <p:option name="debug" required="false" select="'no'"/>
     <p:option name="debug-dir-uri" required="false" select="resolve-uri('debug')"/>

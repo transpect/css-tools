@@ -1,59 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title></title>
-      <link href="style.css" type="text/css" rel="stylesheet"/>
-    </head>
-    <body>
-      
-      <dl>
-        <dt>.class</dt>
-        <dd class="red">red</dd>
-      </dl>
-      <dl>
-        <dt>#id</dt>
-        <dd><span id="green">green</span></dd>
-      </dl>
-      <dl>
-        <dt>*</dt>
-        <dd>bold (font-weight:bold)</dd>
-      </dl>
-      <dl>
-        <dt>element</dt>
-        <dd><span>span</span> (blue)</dd>
-      </dl>
-      <dl>
-        <dt>element1~element2</dt>
-        <dd><a>a </a><span>span preceded by a element (green)</span></dd>
-      </dl>
-      <dl>
-        <dt>[attribute]</dt>
-        <dd title="">title (font-style:italic)</dd>
-      </dl>
-      <dl>
-        <dt>[attribute=value]</dt>
-        <dd title="hurz">hurz (text-transform:uppercase)</dd>
-      </dl>
-      <dl>
-        <dt>[attribute~=value]</dt>
-        <dd title="foo bar">bar (letter-spacing: 0.3em)</dd>
-      </dl>
-      <dl>
-        <dt>[attribute|=value]</dt>
-        <dd><span lang="de">german</span> <span lang="en">english</span> (monospace font)</dd>
-      </dl>
-      <dl>
-        <dt>[attribute^=value]</dt>
-        <dd><a href="http://www.google.de">a[href^="http"]</a> (italic)</dd>
-      </dl>
-      <dl>
-        <dt>[attribute$=value]</dt>
-        <dd><a href="http://bla.blub/filename.pdf">a[href$=".pdf"]</a> (cursive font, background image w/ URL #relative)</dd>
-      </dl>
-      <dl>
-        <dt>[attribute*=le-tex]</dt>
-        <dd><a href="http://www.le-tex.de">a[href*="le-tex"]</a> (red)</dd>
-      </dl>
-      
-    </body>
+  <head>
+    <title>CSS Parser Test</title>
+    <link href="style.css" type="text/css" rel="stylesheet" />
+    <style type="text/css">
+      body{
+        font-family: sans-serif
+      }
+      code { font-size: 120%;}
+      div.demo p{
+        max-width: 42em;
+        font-weight:normal;
+      }</style>
+  </head>
+  <body>
+    <h2>In this demo</h2>
+    <p>This file has been used as a demonstration case during the XML London 2017 demojam. The demo pipeline can be found <a
+        href="https://subversion.le-tex.de/common/presentations/2017-06-11_xmllondon_xproc/samples/xpl/expand-and-check-css.xpl"
+        >here</a>. If you want to run it yourself, check out the whole project one directory level higher. Be advised to use an
+      svn client since otherwise the important externals, including the XML Calabash runtime, will not be checked out.</p>
+    <div class="demo">
+      <p>Parse CSS, using a REx-generated parser</p>
+      <p>… where the CSS is extracted from a source HTML document’s <code>link[@rel='stylesheet']</code> and
+          <code>style</code> elements, its 
+        <code>@style</code> attributes, and CSS <code>@import</code> statements</p>
+      <p>Generate XSLT with XSLT</p>
+      <p>… where the generated XSLT matching patterns correspond to the CSS selectors</p>
+      <p>… where the generated XSLT priorities correspond to the selector specificity and their occurrence order in the
+        document</p>
+      <p>Apply this generated XSLT to the HTML so that the CSS properties will be made explicit at each element, according to the
+        parsed selectors and properties (as <code>@css:font-weight="bold"</code> attributes, for example)</p>
+      <p>Check these properties with Schematron rules (warnings for text-transform and black text colour)</p>
+      <p>Render the resulting SVRL messages next to the error locations in the HTML source.</p>
+      <p>Let XProc orchestrate the pipeline.</p>
+      <h3>Purpose</h3>
+      <p>EPUB quality control</p>
+      <p>Font glyph support analysis (which char is supposed to be rendered with which font/style/weight)</p>
+      <p>Which @font-face and other CSS rules are unused and can be dropped?</p>
+    </div>
+    <h2>CSS Parser Test</h2>
+    <table style="border: 2px solid black">
+      <tr>
+        <th>style attribute</th>
+        <td><p style="color:black; margin-left: 2em">style="color:black; margin-left: 2em"</p></td>
+      </tr>
+      <tr>
+        <th>.class</th>
+        <td class="red">red</td>
+      </tr>
+      <tr>
+        <th>#id</th>
+        <td><span id="green">green</span></td>
+      </tr>
+      <tr>
+        <th>*</th>
+        <td>bold (font-weight:bold)</td>
+      </tr>
+      <tr>
+        <th>element</th>
+        <td><span>span</span> (blue)</td>
+      </tr>
+      <tr>
+        <th>element1~element2</th>
+        <td><a href="http://transpect.io">http://transpect.io</a>
+          <span>span preceded by an <code>a</code> element</span> (purple, non-bold)</td>
+      </tr>
+      <tr>
+        <th>[attribute]</th>
+        <td title="">title (font-style:italic)</td>
+      </tr>
+      <tr>
+        <th>[attribute=value]</th>
+        <td title="foo">title=foo (text-transform:uppercase)</td>
+      </tr>
+      <tr>
+        <th>[attribute~=value]</th>
+        <td title="foo bar">title contains 'bar' (letter-spacing: 0.3em)</td>
+      </tr>
+      <tr>
+        <th>[attribute|=value]</th>
+        <td><span lang="de">German</span>
+          <span lang="en">English</span> (monospace font if lang starts with 'en')</td>
+      </tr>
+      <tr>
+        <th>[attribute^=value]</th>
+        <td><a href="http://www.google.de">a[href^="http"]</a> (italic)</td>
+      </tr>
+      <tr>
+        <th>[attribute$=value]</th>
+        <td><a href="http://bla.blub/filename.pdf">a[href$=".pdf"]</a> (cursive font, background image with (non-sensical) URL
+          '#relative')</td>
+      </tr>
+      <tr>
+        <th>[attribute*=le-tex]</th>
+        <td><a href="http://www.le-tex.de">a[href*="le-tex"]</a> (black, underline)</td>
+      </tr>
+    </table>
+  </body>
 </html>

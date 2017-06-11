@@ -72,7 +72,13 @@
             <xslout:variable name="more-attributes">
               <xslout:next-match/>
             </xslout:variable>
-            <xslout:copy-of select="$more-attributes/*[1]/@*[not(contains('{for $i in $current-node/../declaration/@property return concat($i, if ($i/parent::*/@important='yes') then '_important' else '')}', local-name()))]" />
+            <xslout:copy-of 
+              select="$more-attributes/*[1]/@*[not(local-name() = ({string-join(
+                                                                      for $i in $current-node/../declaration/@property 
+                                                                      return concat('''', $i, if ($i/parent::*/@important='yes') 
+                                                                                              then '_important' else '', ''''),
+                                                                      ', '
+                                                                    )}))]" />
             <xslout:apply-templates mode="#current" />
           </xslout:copy>
         </xslout:template>
