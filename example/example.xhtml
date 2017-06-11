@@ -20,7 +20,10 @@
           href="https://subversion.le-tex.de/common/presentations/2017-06-11_xmllondon_xproc/samples/xpl/expand-and-check-css.xpl"
           >here</a>. You might need to view the source in order to see the XProc – your browser might just show the embedded
         HTML documentation. Also please note that the pipeline’s <code>p:import</code>ed pipelines use canonical URLs that will
-        be resolved by an XML catalog. The won’t resolve when you click on them.</p>
+        be resolved by an <a
+          href="https://subversion.le-tex.de/common/presentations/2017-06-11_xmllondon_xproc/samples/xmlcatalog/catalog.xml">XML
+          catalog</a> that in turn uses catalogs of individual transpect modules that will be present in the checked-out repo
+        (see below). The won’t resolve when you click on them.</p>
       <p>The pipeline uses the XProc step <code>css:expand</code> that in turn invokes <code>css:parse</code>. Both steps are
         defined in the <a href="https://github.com/transpect/css-tools/blob/master/xpl/css.xpl">css.xpl</a> library.</p>
       <p> If you want to run it yourself, check out the <a
