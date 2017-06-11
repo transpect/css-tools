@@ -23,7 +23,7 @@
         be resolved by an <a
           href="https://subversion.le-tex.de/common/presentations/2017-06-11_xmllondon_xproc/samples/xmlcatalog/catalog.xml">XML
           catalog</a> that in turn uses catalogs of individual transpect modules that will be present in the checked-out repo
-        (see below). The won’t resolve when you click on them.</p>
+        (see below). They won’t resolve when you click on them.</p>
       <p>The pipeline uses the XProc step <code>css:expand</code> that in turn invokes <code>css:parse</code>. Both steps are
         defined in the <a href="https://github.com/transpect/css-tools/blob/master/xpl/css.xpl">css.xpl</a> library.</p>
       <p> If you want to run it yourself, check out the <a
@@ -55,7 +55,7 @@
       <p>Apply this generated XSLT to the HTML so that the CSS properties will be made explicit at each element, according to the
         parsed selectors and properties (as <code>@css:font-weight="bold"</code> attributes, for example)</p>
       <p>Check these properties with Schematron rules (warnings for text-transform and black text colour). The rules
-      are inline in the <a
+      are embedded inline in the <a
           href="https://subversion.le-tex.de/common/presentations/2017-06-11_xmllondon_xproc/samples/xpl/expand-and-check-css.xpl"
           >pipeline</a></p>
       <p>Render the resulting SVRL messages next to the error locations in the HTML source.</p>
