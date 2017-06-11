@@ -18,10 +18,11 @@
     <div class="demo">
       <p>This file has been used as a demonstration case during the XML London 2017 demojam. The demo pipeline can be found <a
           href="https://subversion.le-tex.de/common/presentations/2017-06-11_xmllondon_xproc/samples/xpl/expand-and-check-css.xpl"
-          >here</a> (you might need to view the source in order to see the XProc – your browser might just show the embedded
-        HTML documentation). It uses the XProc step <code>css:expand</code> that in turn invokes <code>css:parse</code>. Both
-        steps are defined in the <a href="https://github.com/transpect/css-tools/blob/master/xpl/css.xpl">css.xpl</a>
-        library.</p>
+          >here</a>. You might need to view the source in order to see the XProc – your browser might just show the embedded
+        HTML documentation. Also please note that the pipeline’s <code>p:import</code>ed pipelines use canonical URLs that will
+        be resolved by an XML catalog. The won’t resolve when you click on them.</p>
+      <p>The pipeline uses the XProc step <code>css:expand</code> that in turn invokes <code>css:parse</code>. Both steps are
+        defined in the <a href="https://github.com/transpect/css-tools/blob/master/xpl/css.xpl">css.xpl</a> library.</p>
       <p> If you want to run it yourself, check out the <a
           href="https://subversion.le-tex.de/common/presentations/2017-06-11_xmllondon_xproc/samples/">whole project</a> one
         directory level higher. Be advised to use an svn client since otherwise the important externals, including the XML
