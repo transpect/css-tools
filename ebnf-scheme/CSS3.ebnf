@@ -1,6 +1,6 @@
 css      ::= S* ( (  rule | simple_atrule | mediaquery | COMMENT) S* )*
-simple_atrule  ::= ('@charset'|'@import'|'@namespace') S+ STRING S* ';' 
-rule     ::= selectors_group S? '{' S? (COMMENT? declaration ( S? ';' S? declaration)* ';'? S?)* COMMENT*  '}'
+simple_atrule  ::= ('@charset'|'@import'|'@namespace') S+ QUOTED_STRING S* ';' 
+rule     ::= selectors_group S? '{' S? (COMMENT? declaration ( S? ';' S? declaration)* ';'? S?)* COMMENT* S* '}'
 mediaquery ::= mediarule S? '{' ( S? COMMENT* query_declaration)* S? '}'
 query_declaration ::= rule
 declaration ::=  property S? ':'  (property ':')* S? values 
@@ -28,15 +28,15 @@ class    ::= '.' IDENT
 mediarule ::= '@media' S conditions ( S? conditions| S?  mediaquery_selector )*
 atrule  ::= '@' IDENT
 conditions ::=  ('and'|'screen'|'or'|'only'|'not'|'amzn-mobi'|'amzn-kf8'|'amzn-mobi7'|',') 
-attrib   ::= '[' S* namespace_prefix? IDENT S* ( ( PREFIXMATCH  | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH ) S* ( IDENT | STRING ) S* )? ']'
+attrib   ::= '[' S* namespace_prefix? IDENT S* ( ( PREFIXMATCH  | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH ) S* ( IDENT | QUOTED_STRING ) S* )? ']'
 pseudo   ::= ':' ':'? ( IDENT | functional_pseudo )
 functional_pseudo
          ::= FUNCTION S* expression ')'
 
-property ::= ( STRING | IDENT )
+property ::= ( QUOTED_STRING | IDENT )
 values ::= value (S value | '/' value )* ( S* COMMA S* value (S value | '/' value )* )* important?
-value ::= ( URL | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | STRING | IDENT | functional_pseudo) 
-expression     ::= ( ( PLUS | PERCENTAGE | URL | HEX | '-' | DIMENSION  | NUMBER | STRING | IDENT | COMMA) S* )+
+value ::= ( URL | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | QUOTED_STRING | IDENT | functional_pseudo) 
+expression     ::= ( ( PLUS | PERCENTAGE | URL | HEX | '-' | DIMENSION  | NUMBER | QUOTED_STRING | IDENT | COMMA) S* )+
 negation ::= NOT S* negation_arg S* ')'
 negation_arg
          ::= type_selector
@@ -46,11 +46,19 @@ negation_arg
            | attrib
            | pseudo
            
-STRING   ::= '"' STRING_CONTENT1 '"' | "'" STRING_CONTENT2 "'"
+COMMENT ::=  '/*' CommentContents '*/' 
+URL       ::= 'url(' ( QUOTED_STRING | S* BARE_URL S* ) ')'
+QUOTED_STRING   ::= ('"' STRING_CONTENT1 '"' | "'" STRING_CONTENT2 "'")
+BARE_URL ::= BARE_URL_CHARS
 
 <?TOKENS?>
-EOF      ::= $
-URL       ::= 'url(' ("'"|[\#]|#x0027|nmchar|'/'|'.')+ ')'
+BARE_URL_CHAR
+           ::= #x0021
+            | [#x0023-#x0026]
+            | [#x002A-#xD7FF]
+            | [#xE000-#xFFFD]
+            | [#x10000-#x10FFFF]
+BARE_URL_CHARS ::= (BARE_URL_CHAR)+
 important ::= S '!important'
 ident    ::= [-]? nmstart nmchar*
 name     ::= nmchar+
@@ -93,7 +101,7 @@ SUFFIXMATCH
 SUBSTRINGMATCH
          ::= '*='
 IDENT    ::= ident
-FUNCTION ::= ident '('
+FUNCTION ::= (ident - 'url') '('
 NUMBER   ::= '-'?num
 HASH     ::= '#' name
 HEX      ::= '#' one-to-six-hex-digits
@@ -104,7 +112,15 @@ COMMA    ::= w ','
 TILDE    ::= w '~'
 NOT      ::= ':' N O T '('
 DIMENSION ::= '-'?num S? ('em' | 'px' | 'fr' | 'cm' | 'mm' | 'in' | 'pt' | 'pc'|'vh')
-COMMENT ::= S* '/*' S? (nmchar|':'|';'|','|S|'='|'('|')'|'#'|"'"|'"'|'/'|'.'|'!'|'?'|'@')+ S? '*/' S?
+Char     ::= #x0009
+           | #x000A
+           | #x000D
+           | [#x0020-#xD7FF]
+           | [#xE000-#xFFFD]
+           | [#x10000-#x10FFFF]
+CommentContents
+          ::=( ( Char+ - ( Char* ( '/*' | '*/' ) Char* ) ) - ( Char* '/' ) ) &'*'
+            | ( Char+ - ( Char* ( '/*' | '*/' ) Char* ) ) &'*/'
 one-to-six-hex-digits
          ::= [0-9a-fA-F]
            | [0-9a-fA-F] [0-9a-fA-F]

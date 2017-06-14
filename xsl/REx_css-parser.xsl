@@ -133,18 +133,18 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <xsl:template match="*:simple_atrule[TOKEN[1] = '@import']" mode="expand-imports">
     <xsl:param name="origin" tunnel="yes" as="xs:string"/>
     <xsl:variable name="imported-css" 
-      select="tr:resolve-css-file-content(tr:string-content(STRING), $origin)"/>
+      select="tr:resolve-css-file-content(tr:string-content(QUOTED_STRING|BARE_URL), $origin)"/>
     <xsl:copy-of select="."/>
     <xsl:sequence select="tr:extract-css(
                             $imported-css, 
-                            resolve-uri(tr:string-content(STRING), $origin),
+                            resolve-uri(tr:string-content(QUOTED_STRING), $origin),
                             $remove-comments = 'yes'
                           )/css"/>
   </xsl:template>
   
   <xsl:function name="tr:string-content" as="xs:string">
-    <xsl:param name="string" as="element(STRING)"/>
-    <xsl:sequence select="string($string/(STRING_CONTENT1 | STRING_CONTENT2))"/>
+    <xsl:param name="string" as="element(*)"/><!-- QUOTED_STRING or BARE_URL -->
+    <xsl:sequence select="string($string/(STRING_CONTENT1 | STRING_CONTENT2 | BARE_URL_CHARS))"/>
   </xsl:function>
   
   <xsl:variable name="css:pseudo-classes-regex" select="':(first-child|last-child|link|visited|hover|active|focus|lang|first-line|first-letter|before|after)'" as="xs:string"/>
