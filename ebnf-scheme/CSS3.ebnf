@@ -1,9 +1,9 @@
 css      ::= S* ( (  rule | simple_atrule | mediaquery | COMMENT) S* )*
 simple_atrule  ::= ('@charset'|'@import'|'@namespace') S+ QUOTED_STRING S* ';' 
-rule     ::= selectors_group S? '{' S? (COMMENT? declaration ( S? ';' S? declaration)* ';'? S?)* COMMENT* S* '}'
+rule     ::= selectors_group S? '{' S* (COMMENT? S* declaration ( S? ';' S? declaration?)* ';'? S?)* COMMENT* S* '}'
 mediaquery ::= mediarule S? '{' ( S? COMMENT* query_declaration)* S? '}'
 query_declaration ::= rule
-declaration ::=  property S? ':'  (property ':')* S? values 
+declaration ::=  (property S? ':'  (property ':')* S? values) 
 selectors_group
          ::= selector ( COMMENT? COMMA S* selector )*  
 selector ::= simple_selector_sequence ( combinator simple_selector_sequence )*
