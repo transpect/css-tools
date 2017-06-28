@@ -297,6 +297,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   </xsl:template>
   
   <xsl:template match="declaration" mode="post-process">
+    <xsl:param name="origin" tunnel="yes" as="xs:string"/>
     <xsl:variable name="value" select="values" as="element(values)?"/>
     <xsl:variable name="property" select="property/IDENT" as="xs:string"/>
     <xsl:variable name="pos" as="xs:integer" select="tr:index-of(../declaration, .)"/>
@@ -310,10 +311,14 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
           <xsl:element name="declaration">
             <xsl:attribute name="property" select="$property"/>
             <xsl:attribute name="value" select="current()"/>
-            <xsl:variable name="css-url-regex" select="'.*?url\(''?(.+?)''?\).*'" as="xs:string"/>
-            <xsl:if test="matches(current(), $css-url-regex) or current()/descendant::*:URL">
+            <xsl:variable name="url-container" as="element(*)?" select=".//QUOTED_STRING|.//BARE_URL"/>
+            <xsl:if test="exists($url-container)">
               <xsl:element name="resource">
-                <xsl:attribute name="src" select="resolve-uri(replace(current(), $css-url-regex, '$1'), $base-uri)"/>
+                <xsl:attribute name="src" 
+                  select="resolve-uri(
+                            tr:string-content($url-container), 
+                            ($origin[not(. = 'file://internal')], $base-uri)[1]
+                          )"/>
               </xsl:element>
             </xsl:if>
           </xsl:element>
