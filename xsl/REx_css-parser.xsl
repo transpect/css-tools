@@ -110,18 +110,11 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
         </xsl:document>
       </xsl:for-each>
     </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="exists($with-imports-unexpanded//simple_atrule[TOKEN[1] = '@import'])">
-        <xsl:document>
-          <xsl:apply-templates select="$with-imports-unexpanded" mode="expand-imports">
-            <xsl:with-param name="origin" tunnel="yes" as="xs:string" select="$origin"/>
-          </xsl:apply-templates>
-        </xsl:document>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:sequence select="$with-imports-unexpanded"/>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:document>
+      <xsl:apply-templates select="$with-imports-unexpanded" mode="expand-imports">
+        <xsl:with-param name="origin" tunnel="yes" as="xs:string" select="$origin"/>
+      </xsl:apply-templates>
+    </xsl:document>
   </xsl:function>
   
   <xsl:template match="node() | @*" mode="expand-imports">
@@ -130,14 +123,15 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="*:simple_atrule[TOKEN[1] = '@import']" mode="expand-imports">
+  <xsl:template match="import" mode="expand-imports">
     <xsl:param name="origin" tunnel="yes" as="xs:string"/>
+    <xsl:variable name="url-container" as="element(*)" select=".//QUOTED_STRING|.//BARE_URL"/>
     <xsl:variable name="imported-css" 
-      select="tr:resolve-css-file-content(tr:string-content(QUOTED_STRING|BARE_URL), $origin)"/>
+      select="tr:resolve-css-file-content(tr:string-content($url-container), $origin)"/>
     <xsl:copy-of select="."/>
     <xsl:sequence select="tr:extract-css(
                             $imported-css, 
-                            resolve-uri(tr:string-content(QUOTED_STRING), $origin),
+                            resolve-uri(tr:string-content($url-container), $origin),
                             $remove-comments = 'yes'
                           )/css"/>
   </xsl:template>
@@ -272,7 +266,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </css>
   </xsl:template>
   
-  <xsl:template match="simple_atrule[TOKEN[1] = '@import']" mode="post-process">
+  <xsl:template match="import" mode="post-process">
     <atrule type="import" resolved="{exists(following-sibling::*[1]/self::css)}">
       <xsl:copy-of select="ancestor::css[1]/@origin"/>
       <raw-css>
