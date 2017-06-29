@@ -298,28 +298,39 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   
   <xsl:template match="declaration" mode="post-process">
     <xsl:param name="origin" tunnel="yes" as="xs:string"/>
-    <xsl:variable name="value" select="values" as="element(values)?"/>
+    <xsl:variable name="_value" select="values" as="element(values)?"/>
     <xsl:variable name="property" select="property/IDENT" as="xs:string"/>
     <xsl:variable name="pos" as="xs:integer" select="tr:index-of(../declaration, .)"/>
-    <xsl:for-each select="$value">
+    <xsl:for-each select="$_value">
       <xsl:choose>
         <xsl:when test="$property = $css-shorthand-properties">
-          <shorthand property="{$property}" value="{string($value)}" num="{$pos}"/>
+          <shorthand property="{$property}" value="{string($_value)}" num="{$pos}"/>
           <xsl:sequence select="tr:handle-shorthand-properties($property, current(), string($pos))"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:element name="declaration">
             <xsl:attribute name="property" select="$property"/>
             <xsl:attribute name="value" select="current()"/>
+            <xsl:for-each-group select="value/*" group-starting-with="URL">
+              <xsl:if test="exists(self::URL)">
+                <xsl:element name="resource">
+                  <xsl:attribute name="src" 
+                    select="resolve-uri(
+                              tr:string-content(.//QUOTED_STRING|.//BARE_URL), 
+                              ($origin[not(. = 'file://internal')], $base-uri)[1]
+                            )"/>
+                  <xsl:variable name="format" as="element(functional_pseudo)?" 
+                    select="current-group()/self::functional_pseudo[FUNCTION = 'format(']"/>
+                  <xsl:if test="exists($format)">
+                    <xsl:attribute name="format"
+                      select="tr:string-content($format//QUOTED_STRING)"/>
+                  </xsl:if>
+                </xsl:element>    
+              </xsl:if>
+            </xsl:for-each-group>
             <xsl:variable name="url-container" as="element(*)?" select=".//QUOTED_STRING|.//BARE_URL"/>
             <xsl:if test="exists($url-container)">
-              <xsl:element name="resource">
-                <xsl:attribute name="src" 
-                  select="resolve-uri(
-                            tr:string-content($url-container), 
-                            ($origin[not(. = 'file://internal')], $base-uri)[1]
-                          )"/>
-              </xsl:element>
+              
             </xsl:if>
           </xsl:element>
         </xsl:otherwise>
