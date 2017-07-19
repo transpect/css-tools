@@ -60,7 +60,7 @@ BARE_URL_CHAR
             | [#xE000-#xFFFD]
             | [#x10000-#x10FFFF]
 BARE_URL_CHARS ::= (BARE_URL_CHAR)+
-important ::= S '!important'
+important ::= S '!' S* 'important'
 ident    ::= [-]? nmstart nmchar*
 name     ::= nmchar+
 nmstart  ::= [_a-zA-Z]
