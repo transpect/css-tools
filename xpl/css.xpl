@@ -33,10 +33,11 @@
     <p:output port="report" sequence="true">
       <p:pipe port="report" step="apply-parsing-xsl"/>
     </p:output>
-
+    
     <p:option name="debug" required="false" select="'no'"/>
     <p:option name="debug-dir-uri" required="false" select="resolve-uri('debug')"/>
     <p:option name="status-dir-uri" required="false" select="resolve-uri('status')"/>
+    <p:option name="remove-comments" select="'no'"/>
 
     <tr:file-uri name="base-uri">
       <p:documentation> Calculate base-uri </p:documentation>
@@ -46,8 +47,13 @@
     </tr:file-uri>
 
     <p:try name="apply-parsing-xsl">
-      <p:documentation>First try parsing with comments, then try parsing without comments. Parsing with comments
-      will fail if comments are located in selectors or properties.</p:documentation>
+      <p:documentation>First try parsing with comments (unless $remove-comments='yes' anyway), 
+        then try parsing without comments. Parsing with comments will fail if comments are located 
+        in selectors or properties.
+      We introduced the possibility to remove comments unconditionally (by setting the option 
+      'remove-comments' to 'yes') because Calabash crashed in certain, poorly understood 
+      circumstances with a null pointer exception instead of 
+      catching the error.</p:documentation>
       <p:group>
         <p:output port="result" primary="true"/>
         <p:output port="report" sequence="true">
@@ -64,7 +70,7 @@
           <p:with-param name="base-uri" select="/c:result/@local-href">
             <p:pipe port="result" step="base-uri"/>
           </p:with-param>
-          <p:with-param name="remove-comments" select="'no'"/>
+          <p:with-param name="remove-comments" select="$remove-comments"/>
         </p:xslt>
         <tr:store-debug pipeline-step="css-expand/css.1.parse-try">
           <p:with-option name="active" select="$debug"/>
