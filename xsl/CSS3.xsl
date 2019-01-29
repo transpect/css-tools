@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This file was generated on Tue Sep 26, 2017 16:22 (UTC+02) by REx v5.45 which is Copyright (c) 1979-2017 by Gunther Rademacher <grd@gmx.net> -->
+<!-- This file was generated on Tue Jan 29, 2019 16:20 (UTC+09) by REx v5.48 which is Copyright (c) 1979-2018 by Gunther Rademacher <grd@gmx.net> -->
 <!-- REx command line: CSS3.ebnf -tree -main -xslt -ll 3 -backtrack -->
 
 <xsl:stylesheet version="2.0"
@@ -6981,7 +6981,7 @@
     <xsl:variable name="linefeeds" select="index-of($context, 10)"/>
     <xsl:variable name="line" select="count($linefeeds) + 1"/>
     <xsl:variable name="column" select="($begin - $linefeeds[last()], $begin)[1]"/>
-    <xsl:variable name="expected" select="if ($error/@x) then () else p:expected-token-set($error/@s)"/>
+    <xsl:variable name="expected" select="if ($error/@x or $error/@ambiguous-input) then () else p:expected-token-set($error/@s)"/>
     <xsl:sequence select="
       string-join
       (
@@ -6990,7 +6990,8 @@
             ('syntax error, found ', $p:TOKEN[$error/@o + 1])
           else
             'lexical analysis failed',
-          '&#10;while expecting ',
+          '&#10;',
+          'while expecting ',
           if ($error/@x) then
             $p:TOKEN[$error/@x + 1]
           else
@@ -7282,16 +7283,16 @@
   </xsl:function>
 
   <!--~
-   : Memoize the backtracking result that was computed at decision point
-   : $dpi for input position $e0. Reconstruct state from the parameters.
-   :
-   : @param $state the lexer state to be restored.
-   : @param $update the lexer state containing updates.
-   : @param $dpi the decision point id.
-   : @param $e0 the input position.
-   : @param $v the id of the successful alternative.
-   : @param $lk the new lookahead code.
-   : @return the reconstructed state.
+   ! Memoize the backtracking result that was computed at decision point
+   ! $dpi for input position $e0. Reconstruct state from the parameters.
+   !
+   ! @param $state the lexer state to be restored.
+   ! @param $update the lexer state containing updates.
+   ! @param $dpi the decision point id.
+   ! @param $e0 the input position.
+   ! @param $v the id of the successful alternative.
+   ! @param $lk the new lookahead code.
+   ! @return the reconstructed state.
   -->
   <xsl:function name="p:memoize" as="item()+">
     <xsl:param name="state" as="item()+"/>
@@ -7391,12 +7392,14 @@
           else
             p:parse-css(unparsed-text($input, 'utf-8'))
         "/>
-        <xsl:sequence select="
-          if (empty($result/self::ERROR)) then
-            $result
-          else
-            error(xs:QName('p:parse-css'), concat('&#10;    ', replace($result, '&#10;', '&#10;    ')))
-        "/>
+        <xsl:choose>
+          <xsl:when test="empty($result/self::ERROR)">
+            <xsl:sequence select="$result"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:sequence select="error(xs:QName('p:parse-css'), concat('&#10;    ', replace($result, '&#10;', '&#10;    ')))"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
