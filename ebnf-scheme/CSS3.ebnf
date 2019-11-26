@@ -1,7 +1,8 @@
-css      ::= S* ( (  rule | simple_atrule | import | mediaquery | COMMENT) S* )*
+css      ::= S* ( (  rule | simple_atrule | import | mediaquery | printcssquery | COMMENT) S* )*
 simple_atrule  ::= ('@charset'|'@namespace') S+ QUOTED_STRING S* ';' 
 import ::= '@import' S+ ( QUOTED_STRING | URL ) S* ';'
 rule     ::= selectors_group S? '{' S* (COMMENT? S* declaration ( S? ';' S? declaration?)* ';'? S?)* COMMENT* S* '}'
+printcssquery ::= printcssrule S? '{' ( S? COMMENT* query_declaration)* S? '}'
 mediaquery ::= mediarule S? '{' ( S? COMMENT* query_declaration)* S? '}'
 query_declaration ::= rule
 declaration ::=  (property S? ':'  (property ':')* S? values) 
@@ -26,7 +27,8 @@ element_name
 universal
          ::= namespace_prefix? '*'
 class    ::= '.' IDENT
-mediarule ::= '@media' S conditions ( S? conditions| S?  mediaquery_selector )*
+printcssrule ::= '@media print' 
+mediarule ::= '@media' S conditions ( S? conditions| S?  mediaquery_selector )* 
 atrule  ::= '@' IDENT
 conditions ::=  ('and'|'screen'|'or'|'only'|'not'|'amzn-mobi'|'amzn-kf8'|'amzn-mobi7'|',') 
 attrib   ::= '[' S* namespace_prefix? IDENT S* ( ( PREFIXMATCH  | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH ) S* ( IDENT | QUOTED_STRING ) S* )? ']'
@@ -112,7 +114,7 @@ GREATER  ::= w '>'
 COMMA    ::= w ','
 TILDE    ::= w '~'
 NOT      ::= ':' N O T '('
-DIMENSION ::= '-'?num S? ( 'ch' | 'cm' | 'em' | 'ex' | 'fr' | 'in' | 'mm' | 'pc' | 'pt' | 'px' | 'Q' | 'rem' | 'vh' | 'vmax' | 'vmin' | 'vw' )
+DIMENSION ::= '-'?num S? ( 'ch' | 'cm' | 'em' | 'ex' | 'fr' | 'in' | 'mm' | 'pc' | 'pt' | 'px' | 'Q' | 'rem' | 'vh' | 'vmax' | 'vmin' | 'vw' | 'dpi' )
 Char     ::= #x0009
            | #x000A
            | #x000D

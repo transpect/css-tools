@@ -1,37 +1,67 @@
-code{font-weight:normal}
+/*@font-face{ font-family:'alegreya'; 
+font-weight: normal;
+src: url('alegreya/Alegreya-Bold.otf') format('opentype');
+}*/
 
-.red{color:#ff0000;}
-
-#green{ color:#00ff00; }
-
-*{font-weight:bold}
-
-span{ color:#0000ff;}
-
-a~span{ 
-  color:#aa00aa;
-  font-weight: normal  
+code {
+  font-weight: normal
 }
 
-[title]{font-style:italic}
-
-[title=foo]{text-transform:uppercase}
-
-[title~=bar]{letter-spacing:0.3em}
-
-[lang|=en]{font-family:monospace}
-
-a[href^="http"]{font-style:italic}
-
-a[href$=".pdf"]{
-  font-family:cursive;
-  background-image: url(#relative) /* non-sensical, just for demoing URLs without quotes, but with fragment identifiers */ 
+.red {
+  color: #ff0000;
 }
 
-a[href*="le-tex"]{color: black; text-decoration:underline}
+#green {
+  color: #00ff00;
+}
+
+* {
+  font-weight: normal;
+  font-family: 'alegreya';
+}
+
+span {
+  color: #0000ff;
+}
+
+a ~ span {
+  color: #aa00aa;
+  font-weight: normal
+}
+
+[title] {
+  font-style: italic
+}
+
+[title = foo] {
+  text-transform: uppercase
+}
+
+[title ~= bar] {
+  letter-spacing: 0.3em
+}
+
+[lang |= en] {
+  font-family: monospace
+}
+
+a[href ^= "http"] {
+  font-style: italic
+}
+
+a[href $= ".pdf"] {
+  font-family: cursive;
+  background-image: url(#relative) /* non-sensical, just for demoing URLs without quotes, but with fragment identifiers */
+}
+
+a[href *= "le-tex"] {
+  color: black;
+  text-decoration: underline
+}
 
 
-td, th {
+td,
+th {
   border: 1px solid black;
   padding: 4pt;
 }
@@ -39,4 +69,23 @@ td, th {
 th {
   text-align: left;
   background-color: #e0e0e0;
+}
+
+@media only screen and (min-resolution:300dpi) and (min-resolution:300dpi) {
+  div.comment-notes {
+    width:90%;
+    max-width:90%;
+  }
+}
+
+
+@media print {
+  .menu,
+  .werbung {
+    display: none;
+  }
+  div.comment-notes {
+    width: 90%;
+    max-width: 90%;
+  }
 }

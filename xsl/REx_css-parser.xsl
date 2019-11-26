@@ -248,8 +248,19 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
       <xsl:apply-templates mode="#current"/>
     </atrule>
   </xsl:template>
+  
+  <xsl:template match="printcssquery" mode="post-process">
+    <atrule type="print">
+      <xsl:copy-of select="ancestor::css[1]/@origin"/>
+      <raw-css>
+        <xsl:attribute name="xml:space" select="'preserve'"/>
+        <xsl:value-of select="."/>
+      </raw-css>
+      <xsl:apply-templates mode="#current"/>
+    </atrule>
+  </xsl:template>
 
-  <xsl:template match="mediarule" mode="post-process">
+  <xsl:template match="mediarule | printcssrule" mode="post-process">
     <condition>
       <xsl:value-of select="normalize-space(.)"/>
     </condition>
