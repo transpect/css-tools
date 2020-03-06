@@ -15,7 +15,7 @@
   
   <xsl:template match="/css:css">
     <c:data content-type="text/plain">
-      <xsl:copy-of select="@xml:base"/>
+      <xsl:attribute name="xml:base" select="(@xml:base, base-uri())[1]"/>
       <xsl:apply-templates select="*"/>
     </c:data>
   </xsl:template>
