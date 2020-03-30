@@ -227,7 +227,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <!-- mode post-process -->
   
   <xsl:template match="S | atrule 
-                       | TOKEN[matches(.,'[\{\[}\]\};]')]
+                       | TOKEN[matches(.,'[\{\[}\]\};]|@page')]
                        | simple_atrule[not(TOKEN[1] = '@import')]" mode="post-process"/>
   
   <xsl:template match="COMMENT" mode="post-process">
@@ -260,13 +260,13 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </atrule>
   </xsl:template>
 
-  <xsl:template match="mediarule | printcssrule" mode="post-process">
+  <xsl:template match="mediarule | printcssrule | pagearea | arearule" mode="post-process">
     <condition>
       <xsl:value-of select="normalize-space(.)"/>
     </condition>
   </xsl:template>
   
-  <xsl:template match="query_declaration" mode="post-process">
+  <xsl:template match="query_declaration | pagerule " mode="post-process">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
@@ -293,12 +293,18 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </xsl:apply-templates>
   </xsl:template>
   
-  <xsl:template match="*:rule" mode="post-process">
+  <xsl:template match="*:rule | *:pagequery | *:areaquery" mode="post-process">
     <xsl:param name="origin" tunnel="yes"/>
-    <xsl:element name="{if (descendant::*:atrule) then 'atrule' else 'ruleset'}" namespace="http://www.w3.org/1996/css">
+    <xsl:element name="{if (descendant::*:atrule or self::*:pagequery or self::areaquery) then 'atrule' else 'ruleset'}" namespace="http://www.w3.org/1996/css">
       <xsl:attribute name="origin" select="$origin"/>
-      <xsl:if test="descendant::*:atrule">
+      <xsl:if test="descendant::*:atrule or self::*:pagequery">
         <xsl:attribute name="type" select="descendant::*:atrule/*:IDENT"/>
+      </xsl:if>
+      <xsl:if test="self::*:pagequery">
+        <xsl:attribute name="type" select="'page'"/>
+      </xsl:if>
+      <xsl:if test="self::*:areaquery">
+        <xsl:attribute name="type" select="'area'"/>
       </xsl:if>
       <raw-css xml:space="preserve">
         <xsl:value-of select="."/>

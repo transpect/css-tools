@@ -70,11 +70,10 @@ th {
   text-align: left;
   background-color: #e0e0e0;
 }
-
-@media only screen and (min-resolution:300dpi) and (min-resolution:300dpi) {
+@media only screen and (min-resolution : 300dpi) and (min-resolution : 300dpi) {
   div.comment-notes {
-    width:90%;
-    max-width:90%;
+    width: 90%;
+    max-width: 90%;
   }
 }
 
@@ -88,4 +87,45 @@ th {
     width: 90%;
     max-width: 90%;
   }
+
+  @page {
+    size: 120mm 190mm;
+  }
+
+  @page :left {
+    margin-left: 2cm;
+    margin-right: 1cm;
+    margin-top: 1.5cm;
+    margin-bottom: 3cm;
+  }
+
+
+  @page {
+    counter-increment: page; /* was wird gezählt */
+
+  }
+
+  a[href]::after {
+    content: target-counter(attr(href), page);
+    float: right;
+  }
+  
+  /*-----------------------------------------------Kolumnentitel erstellen----- */
+    h4{
+         string-set: chaptertitle content();} /* definfition eines string-sets (ermöglicht die Speicherung der Zeichenkette eines Element*/                               
+                                        /* in einer Variablen ->chaptertitle */        
+    @page:left{
+        @top-left {
+        content: string(chaptertitle);        /* content:string() ermöglicht Aufruf des Inhalts von chaptetitle */
+        font-family: 'Montserrat';
+        font-size:6pt;
+        }
+        }
+    @page:right{
+        @top-right{
+          content: string(chaptertitle);
+          font-family: 'Montserrat'; 
+          font-size:6pt;
+        }
+    }
 }
