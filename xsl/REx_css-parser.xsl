@@ -211,7 +211,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     <xsl:param name="selector" as="element(selector)" />
     <xsl:variable name="tokens" as="xs:string+">
       <!--a, @style-->
-      <xsl:sequence select="'0'" />
+      <xsl:sequence select="if ($selector/ancestor::mediaquery) then '1' else '0'" />
       <!--b, count id attributes-->
       <xsl:sequence select="string(count($selector/descendant::HASH))" />
       <!--c, count attributes and pseudo-classes-->
@@ -260,10 +260,21 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </atrule>
   </xsl:template>
 
-  <xsl:template match="mediarule | printcssrule | pagearea | arearule" mode="post-process">
+  <xsl:template match="printcssrule | pagearea | arearule" mode="post-process">
     <condition>
       <xsl:value-of select="normalize-space(.)"/>
     </condition>
+  </xsl:template>
+  
+  <xsl:template match="mediarule" mode="post-process">
+    <condition>
+      <xsl:value-of select="normalize-space(.)"/>
+    </condition>
+    <xsl:for-each select="mediaquery_selector">
+      <condition type="{current()/declaration/property//text()}">
+        <xsl:value-of select="current()/declaration/values"/>
+      </condition>
+    </xsl:for-each>
   </xsl:template>
   
   <xsl:template match="query_declaration | pagerule " mode="post-process">

@@ -12,7 +12,8 @@
 
   <xsl:param name="path-constraint" as="xs:string?" /><!-- e.g., '[parent::*:tr]' for expanding only HTML table cell attributes -->
   <xsl:param name="prop-constraint" as="xs:string?" /><!-- e.g., 'width padding-top padding-bottom' -->
-
+  <xsl:param name="mediaquery-constraint" as="xs:string?" /><!-- e.g. 'media: screen, width: 1900px, resolution: 200pdi' or 'print' -->
+  
   <xsl:output indent="yes" />
 
   <xsl:template match="/">
@@ -31,8 +32,23 @@
         </xslout:variable>
         <xslout:apply-templates select="$add-style-info" mode="handle-important-info" />
       </xslout:template>
-
-      <xsl:for-each select="ruleset[declaration]/selector">
+      
+      <xsl:variable name="media-contraint" select="normalize-space(tokenize($mediaquery-constraint, ',')[not(matches(.,'screen|print'))])"/>
+      <xsl:variable name="matching-media-rules"
+        select="for $i in $media-contraint[matches(.,'\w+')]
+                return //atrule[@type='media']
+                [condition[matches(@type,concat('max-',substring-before($i,':')))]
+                          [xs:integer(replace(.,'px','')) &gt; xs:integer(replace(substring-after($i,':'),'px',''))]]
+                [condition[matches(@type,concat('min-',substring-before($i,':')))]
+                           [xs:integer(replace(.,'px','')) &lt; xs:integer(replace(substring-after($i,':'),'px','')) ] , 
+                  0 &lt; xs:integer(replace(substring-after($i,':'),'px',''))]
+                [1],
+                //atrule[@type='media'][count(condition)=1] ">
+        
+      </xsl:variable>
+      <xsl:for-each select="if (matches($mediaquery-constraint,'print')) 
+                            then atrule[@type='print']/ruleset[declaration]/selector
+                            else ruleset[declaration]/selector , $matching-media-rules/ruleset[declaration]/selector">
         <xsl:variable name="current-node" select="." />
         <xsl:variable name="leading-zero" as="xs:string"
           select="string-join(for $i in (string-length(@position) to 3) return '0', '')"/>

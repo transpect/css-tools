@@ -174,6 +174,10 @@
       <p:documentation>space-separated list of property names that should be attached as css: attributes, e.g., 'width
         padding-top padding-bottom'</p:documentation>
     </p:option>
+    <p:option name="mediaquery-constraint" required="false" select="''">
+      <p:documentation>comma separated list with mediaquery properties to be expanded, 
+        e.g. 'media: screen, width: 1900px, resolution: 200pdi' or 'print'</p:documentation>
+    </p:option>
     <p:option name="debug" required="false" select="'no'"/>
     <p:option name="debug-dir-uri" required="false" select="resolve-uri('debug')"/>
 
@@ -192,6 +196,7 @@
       <p:with-param name="debug" select="$debug"/>
       <p:with-param name="path-constraint" select="$path-constraint"/>
       <p:with-param name="prop-constraint" select="$prop-constraint"/>
+      <p:with-param name="mediaquery-constraint" select="$mediaquery-constraint"/>
       <p:input port="stylesheet">
         <p:document href="../xsl/css2xsl.xsl"/>
       </p:input>
