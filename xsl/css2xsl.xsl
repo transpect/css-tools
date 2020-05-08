@@ -48,7 +48,7 @@
       </xsl:variable>
       <xsl:for-each select="if (matches($mediaquery-constraint,'print')) 
                             then atrule[@type='print']/ruleset[declaration]/selector
-                            else ruleset[declaration]/selector , $matching-media-rules/ruleset[declaration]/selector">
+                            else (ruleset[declaration]/selector , $matching-media-rules/ruleset[declaration]/selector)">
         <xsl:variable name="current-node" select="." />
         <xsl:variable name="leading-zero" as="xs:string"
           select="string-join(for $i in (string-length(@position) to 3) return '0', '')"/>
