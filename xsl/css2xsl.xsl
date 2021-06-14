@@ -85,17 +85,19 @@
                   namespace="http://www.w3.org/1996/css"/>
               </xsl:if>
             </xsl:for-each>
-            <xslout:variable name="more-attributes">
+            <xslout:variable name="more-attributes" as="element(*)">
               <xslout:next-match/>
             </xslout:variable>
             <xslout:copy-of 
-              select="$more-attributes/*[1]/@*[not(local-name() = ({string-join(
-                                                                      for $i in $current-node/../declaration/@property 
-                                                                      return concat('''', $i, if ($i/parent::*/@important='yes') 
-                                                                                              then '_important' else '', ''''),
-                                                                      ', '
-                                                                    )}))]" />
-            <xslout:apply-templates mode="#current" />
+                  select="$more-attributes/@*[not(local-name() = ({string-join(
+                                                                    for $i in $current-node/../declaration/@property 
+                                                                    return concat('''', $i, if ($i/parent::*/@important='yes') 
+                                                                                            then '_important' else '', ''''),
+                                                                    ', '
+                                                                  )}))]" />
+            <xslout:if test="$more-attributes/processing-instruction(fin)">
+              <xslout:copy-of select="$more-attributes/node()"/>
+            </xslout:if>
           </xslout:copy>
         </xslout:template>
       </xsl:for-each>
@@ -119,16 +121,23 @@
         </xslout:copy>
       </xslout:template>
 
-      <xslout:template match="*" priority="-1000" mode="#all">
+      <xslout:template match="processing-instruction(fin)" mode="add-style-info"/>
+
+      <xslout:template match="*" priority="-1000" mode="add-style-info #default handle-important-info">
         <xslout:copy>
           <xslout:namespace name="css">http://www.w3.org/1996/css</xslout:namespace>
           <xslout:apply-templates select="@* | node()" mode="#current" />
         </xslout:copy>
       </xslout:template>
-      <xslout:template match="attribute() | text() | processing-instruction() | comment()" priority="-95" mode="#all">
+      <xslout:template match="*" priority="-1000" mode="add-css-info">
         <xslout:copy>
+          <xslout:namespace name="css">http://www.w3.org/1996/css</xslout:namespace>
           <xslout:apply-templates select="@* | node()" mode="#current" />
+          <xslout:processing-instruction name="fin"/>
         </xslout:copy>
+      </xslout:template>
+      <xslout:template match="attribute() | text() | processing-instruction() | comment()" priority="-95" mode="#all">
+        <xslout:copy/>
       </xslout:template>
 
 
