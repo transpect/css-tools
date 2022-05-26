@@ -390,7 +390,6 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   <xsl:template match="element_name" mode="post-process">
     <xsl:text>*:</xsl:text>
     <xsl:value-of select="IDENT"/>  
-    <xsl:text></xsl:text>
   </xsl:template>
   
   <xsl:template match="*:pseudo" mode="post-process">
