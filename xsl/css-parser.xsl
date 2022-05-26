@@ -163,7 +163,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </xsl:for-each-group>    
   </xsl:function>
 
-  <xsl:variable name="css:pseudo-classes-regex" select="':(first-child|last-child|link|visited|hover|active|focus|lang|first-line|first-letter|before|after)'" as="xs:string"/>
+  <xsl:variable name="css:pseudo-classes-regex" select="'::?(first-child|last-child|link|visited|hover|active|focus|lang|first-line|first-letter|before|after)'" as="xs:string"/>
 
   <xsl:template name="selectors">
     <xsl:param name="raw-selectors" />
@@ -226,7 +226,8 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
       </xsl:for-each>  
     </xsl:variable>
     <!-- empty $prelim may occur if the raw selector is just ':before', for example -->
-    <xsl:sequence select="string-join((if (starts-with(($prelim[normalize-space()])[1], '*')) then '' else '*:', if (empty($prelim)) then '*' else $prelim), '')"/>
+    <xsl:sequence select="string-join((if (starts-with(($prelim[normalize-space()])[1], '*')) then '' else '*:', 
+                                       if (empty($prelim)) then '*' else $prelim), '')"/>
   </xsl:function>
 
   <xsl:function name="tr:resolve-combinators" as="xs:string">
@@ -337,7 +338,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     <xsl:param name="var-resolve-pseudo-classes" as="xs:string"/>
     <xsl:choose>
       <xsl:when test="matches($var-resolve-pseudo-classes, $css:pseudo-classes-regex)">
-        <xsl:analyze-string select="$var-resolve-pseudo-classes" regex="(^|[^:]*):([^:.]*)">
+        <xsl:analyze-string select="$var-resolve-pseudo-classes" regex="(^|[^:]*)::?([^:.]*)">
           <xsl:matching-substring>
             <xsl:choose>
               <xsl:when test="regex-group(2) = 'first-child'">
