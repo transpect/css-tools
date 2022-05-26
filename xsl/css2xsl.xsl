@@ -79,7 +79,7 @@
                         }" 
                   select="'{  
                             if(@property eq 'content') 
-                            then @value 
+                            then tr:quote-single-quotes(@value) 
                             else tr:strip-delims(@value)
                           }'" 
                   namespace="http://www.w3.org/1996/css"/>
@@ -177,6 +177,11 @@
       </xsl:analyze-string>
     </xsl:variable>
     <xsl:sequence select='replace(string-join($result-seq, ""), "([&#x27;])(.*?)[&#x27;]", "$1$1$2$1$1")'/>
+  </xsl:function>
+  
+  <xsl:function name="tr:quote-single-quotes" as="xs:string">
+    <xsl:param name="content" as="xs:string" />
+    <xsl:sequence select='replace($content, "([&#x27;])(.*?)[&#x27;]", "$1$1$2$1$1")'/>
   </xsl:function>
   
   <xsl:function name="tr:hex-to-dec" as="xs:integer">
