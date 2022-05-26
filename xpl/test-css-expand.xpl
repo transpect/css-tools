@@ -9,7 +9,7 @@
     <p:documentation>an XHTML document</p:documentation>
   </p:input>
   <p:input port="stylesheet">
-    <p:document href="../xsl/css-parser.xsl"/>
+    <p:document href="../xsl/REx_css-parser.xsl"/>
     <p:documentation>a stylesheet that can be overriden, e.g. if CSS2.1 features are wanted only</p:documentation>
   </p:input>
   <p:output port="result" primary="true">
