@@ -15,7 +15,10 @@
   <xsl:param name="mediaquery-constraint" as="xs:string?" /><!-- e.g. 'media: screen, width: 1900px, resolution: 200pdi' or 'print' -->
   
   <xsl:output indent="yes" />
-
+  
+  <xsl:variable name="condition-inducing-pseudos" as="xs:string+"
+    select="('first-child')"/>
+  
   <xsl:template match="/">
     <xsl:apply-templates mode="create-xsl" />
   </xsl:template>
@@ -56,6 +59,13 @@
           priority="{number(concat(replace(@priority, ',', ''), '.', $leading-zero, @position))}" mode="add-css-info">
           <xslout:copy>
             <xslout:apply-templates select="@*" mode="#current" />
+            <xsl:variable name="is-pseudo" as="xs:boolean"
+              select="exists($current-node/@pseudo[not(tokenize(., '\s+') = $condition-inducing-pseudos)])"/>
+            <xsl:if test="$is-pseudo">
+              <xslout:variable name="next-match" as="element(*)">
+                <xslout:next-match/>
+              </xslout:variable>
+            </xsl:if>
             <xsl:for-each select="../declaration">
               <xsl:if test="empty($prop-constraint)
                             or
@@ -63,36 +73,21 @@
                             or
                             tokenize($prop-constraint, '\s+') = string(@property)">
                 <xslout:attribute 
-                  name="{
-                          concat(
-                            if ($current-node/@pseudo) 
-                              then concat('pseudo-', $current-node/@pseudo, '_') 
-                              else '',
-                            if (starts-with(@property, '-')) 
-                              then '_' 
-                              else '',
-                            @property, 
-                            if (@important='yes') 
-                              then '_important' 
-                              else ''
-                          )
-                        }" 
+                  name="{tr:prop-attr-name(.)}" 
                   select="'{  
                             if(@property eq 'content') 
                             then tr:quote-single-quotes(@value) 
                             else tr:strip-delims(@value)
-                          }'" 
-                  namespace="http://www.w3.org/1996/css"/>
+                          }'" />
               </xsl:if>
             </xsl:for-each>
             <xslout:variable name="more-attributes" as="element(*)">
               <xslout:next-match/>
             </xslout:variable>
             <xslout:copy-of 
-                  select="$more-attributes/@*[not(local-name() = ({string-join(
-                                                                    for $i in $current-node/../declaration/@property 
-                                                                    return concat('''', $i, if ($i/parent::*/@important='yes') 
-                                                                                            then '_important' else '', ''''),
+                  select="$more-attributes/@*[not(name() = ({string-join(
+                                                                    for $d in $current-node/../declaration 
+                                                                    return concat('''', tr:prop-attr-name($d), ''''),
                                                                     ', '
                                                                   )}))]" />
             <xslout:if test="$more-attributes/processing-instruction(fin)">
@@ -161,6 +156,23 @@
 
     </xslout:stylesheet>
   </xsl:template>
+  
+  <xsl:function name="tr:prop-attr-name" as="xs:string">
+    <xsl:param name="decl" as="element(declaration)"/>
+    <xsl:variable name="sel" as="element(selector)" select="$decl/../selector"/>
+    <xsl:sequence select="concat(
+                            if ($sel/@pseudo[not(tokenize(., '\s+') = $condition-inducing-pseudos)]) 
+                              then concat('css:pseudo-', $sel/@pseudo, '_') 
+                              else 'css:',
+                            if (starts-with($decl/@property, '-'))
+                              then '_' 
+                              else '',
+                            $decl/@property, 
+                            if ($decl/@important='yes') 
+                              then '_important' 
+                              else ''
+                          )"/>
+  </xsl:function>
 
   <xsl:function name="tr:strip-delims" as="xs:string">
     <xsl:param name="content" as="xs:string" />

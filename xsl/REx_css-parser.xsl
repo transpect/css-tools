@@ -392,10 +392,10 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     <xsl:value-of select="IDENT"/>  
   </xsl:template>
   
-  <xsl:template match="*:pseudo" mode="post-process">
-    <xsl:text>[@css:pseudo_</xsl:text>
-    <xsl:value-of select="*:IDENT"/>
-    <xsl:text>]</xsl:text>
+  <xsl:template match="*:pseudo" mode="post-process"/>
+  
+  <xsl:template match="*:pseudo[tokenize(*:IDENT, '\s+') = 'first-child']" mode="post-process">
+    <xsl:text>[index-of(for $e in ../* return generate-id($e), generate-id()) = 1]</xsl:text>
   </xsl:template>
   
   <xsl:template match="simple_selector_sequence/universal" mode="post-process">
@@ -425,10 +425,14 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </selector>
   </xsl:template>
   
+  <xsl:variable name="condition-inducing-pseudos" as="xs:string+"
+    select="('first-child')"/>
+  
   <xsl:template match="simple_selector_sequence" mode="post-process">
     <xsl:variable name="elements" select="universal | type_selector" as="element(*)*"/>
     <xsl:variable name="attribs" select="attrib" as="element(attrib)*"/>
-    <xsl:variable name="other-conditions" select="class | HASH | pseudo" as="element(*)*"/>
+    <xsl:variable name="other-conditions" as="element(*)*"
+      select="class | HASH | pseudo[tokenize(IDENT, '\s+') = $condition-inducing-pseudos]" />
     <xsl:apply-templates select="$elements" mode="#current"/>
     <xsl:if test="empty($elements)">
       <xsl:text>*</xsl:text>
