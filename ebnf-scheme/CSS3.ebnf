@@ -41,7 +41,7 @@ functional_pseudo
          ::= FUNCTION S* expression? ')'
 pagearea::= ':'('left'|'right')
 property ::= ( QUOTED_STRING | IDENT )
-values ::= value (S value | '/' value )* ( S* COMMA S* value (S value | '/' value )* )* important?
+values ::= value (S value | S* '/' S* value )* ( S* COMMA S* value (S value | '/' value )* )* important?
 value ::= ( URL | ATTR | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | QUOTED_STRING | IDENT | functional_pseudo) 
 expression     ::= ( ( PLUS | PERCENTAGE | URL | ATTR | HEX | '-' | DIMENSION  | NUMBER | QUOTED_STRING | IDENT | COMMA) S* )+
 negation ::= NOT S* negation_arg S* ')'
