@@ -159,7 +159,12 @@
   
   <xsl:function name="tr:prop-attr-name" as="xs:string">
     <xsl:param name="decl" as="element(declaration)"/>
-    <xsl:variable name="sel" as="element(selector)" select="$decl/../selector"/>
+    <xsl:variable name="sel" as="element(selector)+" select="$decl/../selector"/>
+    <xsl:variable name="pseudo" as="xs:string?" 
+      select="$sel/@pseudo[not(tokenize(., '\s+') = $condition-inducing-pseudos)]"/>
+    <xsl:if test="count($pseudo) gt 1">
+      <xsl:message terminate="yes" select="'Unsupported: Different pseudos in ', $sel"/>
+    </xsl:if>
     <xsl:sequence select="concat(
                             if ($sel/@pseudo[not(tokenize(., '\s+') = $condition-inducing-pseudos)]) 
                               then concat('css:pseudo-', $sel/@pseudo, '_') 
