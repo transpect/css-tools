@@ -12,7 +12,9 @@
        See ../README for copyright information
     -->
   
-  <xsl:variable name="css-shorthand-properties" select="('background', 'border', 'border-left', 'border-right', 'border-top', 'border-bottom', 'font', 'list-style', 'margin', 'padding', 'text-decoration')" as="xs:string+" />
+  <xsl:variable name="css-shorthand-properties" as="xs:string+"
+    select="('background', 'border', 'border-left', 'border-right', 'border-top', 'border-bottom', 
+             'font', 'list-style', 'margin', 'padding', 'text-decoration')" />
   
   <xsl:template name="declarations" xpath-default-namespace="http://www.w3.org/1996/css">
     <xsl:param name="raw-declarations" as="xs:string"/>
@@ -64,6 +66,8 @@
 
 
   <xsl:function name="tr:handle-shorthand-properties" as="element(*)*">
+    <!-- this is overridden in REx_css-parser.xsl where it will be applied in mode post-process
+         If you want to improve REx parser shorthand handling, turn to the overridden function -->
     <xsl:param name="prop" as="xs:string"/>
     <xsl:param name="val" as="xs:string"/>
     <xsl:param name="id" as="xs:string"/>
