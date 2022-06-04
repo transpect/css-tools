@@ -17,7 +17,7 @@
   <xsl:output indent="yes" />
   
   <xsl:variable name="condition-inducing-pseudos" as="xs:string+"
-    select="('first-child')"/>
+    select="('first-child', 'last-child')"/>
   
   <xsl:template match="/">
     <xsl:apply-templates mode="create-xsl" />
@@ -60,7 +60,7 @@
           <xslout:copy>
             <xslout:apply-templates select="@*" mode="#current" />
             <xsl:variable name="is-pseudo" as="xs:boolean"
-              select="exists($current-node/@pseudo[not(tokenize(., '\s+') = $condition-inducing-pseudos)])"/>
+              select="exists(tokenize($current-node/@pseudo, '\s+')[not(. = $condition-inducing-pseudos)])"/>
             <xsl:if test="$is-pseudo">
               <xslout:variable name="next-match" as="element(*)">
                 <xslout:next-match/>
@@ -160,14 +160,14 @@
   <xsl:function name="tr:prop-attr-name" as="xs:string">
     <xsl:param name="decl" as="element(declaration)"/>
     <xsl:variable name="sel" as="element(selector)+" select="$decl/../selector"/>
-    <xsl:variable name="pseudo" as="xs:string?" 
-      select="$sel/@pseudo[not(tokenize(., '\s+') = $condition-inducing-pseudos)]"/>
+    <xsl:variable name="pseudo" as="xs:string*" 
+      select="tokenize($sel/@pseudo, '\s+')[not(. = $condition-inducing-pseudos)]"/>
     <xsl:if test="count($pseudo) gt 1">
       <xsl:message terminate="yes" select="'Unsupported: Different pseudos in ', $sel"/>
     </xsl:if>
     <xsl:sequence select="concat(
-                            if ($sel/@pseudo[not(tokenize(., '\s+') = $condition-inducing-pseudos)]) 
-                              then concat('css:pseudo-', $sel/@pseudo, '_') 
+                            if ($pseudo[1]) 
+                              then concat('css:pseudo-', $pseudo[1], '_') 
                               else 'css:',
                             if (starts-with($decl/@property, '-'))
                               then '_' 

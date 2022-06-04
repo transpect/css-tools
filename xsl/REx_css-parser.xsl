@@ -416,6 +416,10 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     <xsl:text>[index-of(for $e in ../* return generate-id($e), generate-id()) = 1]</xsl:text>
   </xsl:template>
   
+  <xsl:template match="*:pseudo[tokenize(*:IDENT, '\s+') = 'last-child']" mode="post-process">
+    <xsl:text>[index-of(for $e in ../* return generate-id($e), generate-id()) = count(../*)]</xsl:text>
+  </xsl:template>
+  
   <xsl:template match="simple_selector_sequence/universal" mode="post-process">
     <xsl:text>*</xsl:text>
   </xsl:template>
@@ -444,7 +448,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   </xsl:template>
   
   <xsl:variable name="condition-inducing-pseudos" as="xs:string+"
-    select="('first-child')"/>
+    select="('first-child', 'last-child')"/>
   
   <xsl:template match="simple_selector_sequence" mode="post-process">
     <xsl:variable name="elements" select="universal | type_selector" as="element(*)*"/>

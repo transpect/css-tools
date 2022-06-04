@@ -22,6 +22,9 @@
       div.foo p {
         font: italic normal 80% serif;
       }
+      div.foo p:first-child::after {
+        content: ' styled by style element';
+      }
       div.foo {
         font: normal 400 normal 80% 'New Century Schoolbook', "Palatino Linotype", serif;
       }
