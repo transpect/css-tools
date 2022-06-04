@@ -1,0 +1,14 @@
+seg[type=foo]::before {
+    content: '[';
+    color: red;
+}
+seg[type=foo]::after {
+    content: ']';
+    color: red;
+}
+seg[type=foo] {
+    color: red;
+}
+sec#intro title {
+    color: grey;
+}

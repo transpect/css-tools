@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href='style3.css'?>
+<doc>
+  <sec id="intro">
+    <title>Introduction</title>
+    <p>Para</p>
+  </sec>
+  <sec id="sec1">
+    <title>Section</title>
+    <p>First <seg type="foo">para</seg></p>
+    <p>Last para</p>
+  </sec>
+</doc>
