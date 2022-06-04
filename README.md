@@ -66,6 +66,31 @@ Expanded output (`body` only):
 </body>
 ```
 
+## Example 3: Styling XML
+
+Again using an `xml-stylesheet` processing instruction.
+
+See [example3.xml](https://github.com/transpect/css-tools/blob/master/example/example3.xml) and [style3.css](https://github.com/transpect/css-tools/blob/master/example/style3.css)
+
+Expanded output:
+
+```xml
+<doc xmlns:css="http://www.w3.org/1996/css">
+  <sec id="intro">
+    <title css:color="grey">Introduction</title>
+    <p>Para</p>
+  </sec>
+  <sec id="sec1">
+    <title>Section</title>
+    <p>First <seg type="foo" css:pseudo-after_content="']'" css:pseudo-after_color="red" css:pseudo-before_content="'['" css:pseudo-before_color="red" css:color="red">para</seg></p>
+    <p>Last para</p>
+  </sec>
+</doc>
+```
+
+You can then postprocess the `@css:pseudo.…` attributes in order to actually prepend/append the `::before` and `::after` pseudo element content to the element’s text.
+
+
 # css:parse
 
 There is also a step `css:parse` in the same css.xpl library. This will only generate an XML representation from the CSS that was included per `link` or `style` elements (note that the input is expected to be in XHTML namespace; will add reading HTML5-serialized input later). 
