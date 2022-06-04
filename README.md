@@ -2,7 +2,7 @@
 
 Parse CSS styles of an XHTML document and expand them as XML attributes ([CSSa](https://github.com/le-tex/CSSa))
 
-## Example
+## Example 1
 
 Consider this document as input:
 
@@ -25,37 +25,7 @@ Consider this document as input:
 Invoke `css:expand` in your XProc pipeline. Please note 
 that you have to include [xproc-utils](https://github.com/transpect/xproc-util).
 
-```xml
-<?xml version="1.0"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" 
-  xmlns:c="http://www.w3.org/ns/xproc-step" 
-  xmlns:css="http://www.w3.org/1996/css" 
-  version="1.0"
-  name="test-css-expand">
-
-  <p:input port="source" primary="true">
-    <p:documentation>an XHTML document</p:documentation>
-  </p:input>
-  
-  <p:output port="result" primary="true">
-    <p:documentation>an XHTML document with CSSa attributes
-    (in addition to its style elements/attributes/linked CSS
-      stylesheets)</p:documentation>
-  </p:output>
-  
-  <p:import href="css.xpl"/>
-
-  <css:expand name="expand">
-    <p:input port="stylesheet">
-      <!-- This will replace the default EBNF/REx-based parser with the 
-      traditional regex-based parser. Otherwise, simply omit this input
-      connection. -->
-      <p:document href="../xsl/css-parser.xsl"/>
-    </p:input>
-  </css:expand>
-
-</p:declare-step>
-```
+See [test-css-expand.xpl](https://github.com/transpect/css-tools/blob/master/xpl/test-css-expand.xpl) for an example pipeline.
 
 
 After running `css-expand`, internal and external CSS style information are expanded as XML attributes.
@@ -73,6 +43,27 @@ After running `css-expand`, internal and external CSS style information are expa
     <p class="red" css:color="red">This text has the color red.</p>
   </body>
 </html>
+```
+
+## Example 2
+
+This example contains an `xml-stylesheet` processing instruction as an additional CSS source. It also demonstrates the handling of 
+shorthand properties and pseudo elements.
+
+See [example2.xhtml](https://github.com/transpect/css-tools/blob/master/example/example2.xhtml) and [style2.css](https://github.com/transpect/css-tools/blob/master/example/style2.css)
+
+Expanded output (`body` only):
+
+```html
+<body css:background-color="#eec">
+  <div id="grid">
+    <div id="reference-overlapped-red" css:color="red" css:font-style="normal" css:font-variant="normal" css:font-weight="normal" css:font-stretch="normal" css:font-size="100px" css:line-height="1" css:font-family="Ahem" css:grid-row="1" css:grid-column="1">R</div>
+    <div id="test-overlapping-green" css:background-color="green" css:width="100px" css:height="100px" css:grid-row="1" css:grid-column="1" css:font-style="normal" css:font-variant="normal" css:font-weight="bold" css:font-stretch="normal" css:font-size="12px" css:line-height="120%" css:font-family="sans-serif"/>
+  </div>
+  <div class="foo" css:font-style="normal" css:font-variant="normal" css:font-weight="400" css:font-stretch="normal" css:font-size="80%" css:line-height="normal" css:font-family="'New Century Schoolbook', &#34;Palatino Linotype&#34;, serif">
+    <p css:pseudo-after_content="' styled by style element'" css:pseudo-before_content="'styled by PI '" css:font-style="italic" css:font-variant="normal" css:font-weight="normal" css:font-stretch="normal" css:font-size="80%" css:line-height="normal" css:font-family="serif">Test</p>
+  </div>
+</body>
 ```
 
 # css:parse
