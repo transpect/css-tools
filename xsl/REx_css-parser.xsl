@@ -28,7 +28,7 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:apply-templates mode="extract-css"
-        select="/processing-instruction(xml-stylesheet)
+        select="/processing-instruction(xml-stylesheet)[matches(., 'type\s*=\s*.text/css')]
                 union html:html/html:head/(html:link[@type = 'text/css' or @rel = 'stylesheet'] 
                 union html:style)"/>
     </parser-results>
