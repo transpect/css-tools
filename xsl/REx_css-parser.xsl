@@ -28,8 +28,22 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:apply-templates mode="extract-css"
-        select="html:html/html:head/(html:link[@type = 'text/css' or @rel = 'stylesheet'] union html:style)"/>
+        select="/processing-instruction(xml-stylesheet)
+                union html:html/html:head/(html:link[@type = 'text/css' or @rel = 'stylesheet'] 
+                union html:style)"/>
     </parser-results>
+  </xsl:template>
+
+  <xsl:template match="processing-instruction(xml-stylesheet)" mode="extract-css">
+    <xsl:variable name="href" as="xs:string">
+      <xsl:analyze-string select="." regex="href\s*=\s*[&apos;&quot;]([^&apos;&quot;]+)[&apos;&quot;]" flags="s">
+        <xsl:matching-substring>
+          <xsl:sequence select="regex-group(1)"/>
+        </xsl:matching-substring>
+      </xsl:analyze-string>
+    </xsl:variable>
+    <xsl:variable name="external-css" as="xs:string?" select="tr:resolve-css-file-content($href, $base-uri)"/>
+    <xsl:sequence select="tr:extract-css($external-css, $href, $remove-comments = 'yes')/css"></xsl:sequence>
   </xsl:template>
 
   <xsl:function name="tr:external-css-file-available" as="xs:boolean">
@@ -333,7 +347,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
       <xsl:choose>
         <xsl:when test="$property = $css-shorthand-properties">
           <shorthand property="{$property}" value="{string($_value)}" num="{$pos}"/>
-          <xsl:sequence select="tr:handle-shorthand-properties($property, current(), string($pos))"/>
+          <xsl:apply-templates select=".." mode="expand-shorthands"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:element name="declaration">
@@ -365,7 +379,14 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
+
+  <xsl:template match="declaration" mode="expand-shorthands">
+    <xsl:sequence select="tr:handle-shorthand-properties(property/IDENT, values, string(tr:index-of(../declaration, .)))"/>
+  </xsl:template>
   
+  <!--<xsl:template match="declaration[property/IDENT = 'font']" mode="expand-shorthands">
+  </xsl:template>-->
+
   <xsl:template match="selectors_group" mode="post-process">
     <xsl:for-each-group select="*" group-starting-with="COMMA">
       <xsl:apply-templates select="current-group()/self::selector" mode="#current"/>
@@ -522,7 +543,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     </xsl:copy>
   </xsl:template>
 
-  <!--  overwritten function from css-util -->
+  <!--  overridden function from css-util -->
   <xsl:function name="tr:handle-shorthand-properties" as="element(*)*">
     <xsl:param name="prop" as="xs:string"/>
     <xsl:param name="val"/>
@@ -622,7 +643,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
         </xsl:when>
 
         <xsl:when test="$prop='font'">
-          <xsl:variable name="tokens" select="$val-seq/*:value"/>
+          <xsl:variable name="tokens" select="tokenize($val-seq, '\s+')"/>
           
           <xsl:choose>
             <xsl:when test="count($tokens) = 2">
