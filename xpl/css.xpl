@@ -119,7 +119,7 @@
       </p:catch>
     </p:try>
     
-    <tr:store-debug pipeline-step="css-expand/css.1.parse">
+    <tr:store-debug pipeline-step="css-expand/css.1.parse" indent="false">
       <p:with-option name="active" select="$debug"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
     </tr:store-debug>
