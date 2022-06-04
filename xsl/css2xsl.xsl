@@ -183,7 +183,7 @@
     <xsl:param name="content" as="xs:string" />
     <xsl:variable name="s1" as="xs:string" select='replace($content, "^[&#x27;](.*?)[&#x27;]$", "$1")' />
     <xsl:variable name="s2" as="xs:string" select="replace($s1, '^[&#x22;](.*?)[&#x22;]$', '$1')" />
-    <xsl:variable name="result-seq" as="xs:string+">
+    <xsl:variable name="result-seq" as="xs:string*">
       <xsl:analyze-string select="$s2" regex="\\([0-9A-Fa-f]{{2,5}})">
         <xsl:matching-substring>
           <xsl:sequence select="codepoints-to-string(tr:hex-to-dec(regex-group(1)))"/>

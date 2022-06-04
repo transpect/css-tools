@@ -1,0 +1,7 @@
+body {
+    background-color: #eec;
+}
+
+div.foo p::before {
+    content: 'styled by PI ';
+}

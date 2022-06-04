@@ -384,9 +384,6 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
     <xsl:sequence select="tr:handle-shorthand-properties(property/IDENT, values, string(tr:index-of(../declaration, .)))"/>
   </xsl:template>
   
-  <!--<xsl:template match="declaration[property/IDENT = 'font']" mode="expand-shorthands">
-  </xsl:template>-->
-
   <xsl:template match="selectors_group" mode="post-process">
     <xsl:for-each-group select="*" group-starting-with="COMMA">
       <xsl:apply-templates select="current-group()/self::selector" mode="#current"/>
@@ -544,7 +541,7 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
   </xsl:template>
 
   <!--  overridden function from css-util -->
-  <xsl:function name="tr:handle-shorthand-properties" as="element(*)*">
+  <xsl:function name="tr:handle-shorthand-properties" as="element(*)*" xmlns="http://www.w3.org/1996/css">
     <xsl:param name="prop" as="xs:string"/>
     <xsl:param name="val"/>
     <xsl:param name="id" as="xs:string"/>
@@ -643,34 +640,33 @@ or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work fo
         </xsl:when>
 
         <xsl:when test="$prop='font'">
-          <xsl:variable name="tokens" select="tokenize($val-seq, '\s+')"/>
-          
-          <xsl:choose>
-            <xsl:when test="count($tokens) = 2">
-              <!-- token 1 is size, token 2 is family -->
-              <declaration xmlns="http://www.w3.org/1996/css" property="font-size" value="{$tokens[1]}" shorthand="{$id}"/>
-              <declaration xmlns="http://www.w3.org/1996/css" property="font-family" value="{$tokens[2]}" shorthand="{$id}"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:for-each select="('style', 'weight', 'size' , 'line-height', 'family')">
-                <xsl:variable name="current-pos" select="position()"/>
-                <xsl:element name="declaration" xmlns="http://www.w3.org/1996/css">
-                  <xsl:attribute name="property" select="if (current() = 'line-height') then current() else concat('font-', .)"/>
-                  <xsl:choose>
-                    <xsl:when test="$val/*:value = 'inherit'">
-                      <xsl:attribute name="value" select="$val"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:attribute name="value"
-                        select="$tokens[if ($current-pos le 4) then (position() eq $current-pos) else (position() ge 5)]"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                  <xsl:attribute name="shorthand" select="$id"/>
-                </xsl:element>
-              </xsl:for-each>
-            </xsl:otherwise>
-          </xsl:choose>
-          
+          <xsl:variable name="tokens" select="$val-seq/*:value"/>
+          <xsl:variable name="value-before-comma" as="element()*" 
+            select="($tokens[following-sibling::*[empty(self::*:S) (: the parser currently can’t cope with comments 
+            in props, otherwise these must be excluded, too :)][1]/self::*:COMMA])[1]"/>
+          <xsl:variable name="font-family" as="element()+"
+            select="if ($value-before-comma) then ($value-before-comma, $tokens[. >> $value-before-comma])
+                    else $tokens[last()]"/>
+          <xsl:variable name="line-height" as="element()?" select="$tokens[preceding-sibling::*[1]/self::TOKEN[. = '/']]"/>
+          <xsl:variable name="font-size" as="element()" 
+            select="if ($line-height) then $line-height/preceding-sibling::*:value[1]
+                    else $font-family[1]/preceding-sibling::*:value[1]"/>
+          <xsl:variable name="font-style-unambiguous" select="$tokens[$font-size >> .][*:IDENT = ('italic', 'oblique')]"/>
+          <xsl:variable name="font-variant-unambiguous" select="$tokens[$font-size >> .][*:IDENT = ('small-caps')]"/>
+          <xsl:variable name="font-weight-unambiguous" 
+            select="$tokens[$font-size >> .][*:IDENT = ('bold', 'bolder', 'lighter')
+                                             or *:NUMBER[matches(., '^[1-9]00$')]]"/>
+          <xsl:variable name="font-stretch-unambiguous" 
+            select="$tokens[$font-size >> .][*:IDENT = ('ultra-condensed', 'extra-condensed', 'condensed', 'semi-condensed', 
+                                                        'semi-expanded', 'expanded', 'extra-expanded', 'ultra-expanded') 
+                                             or *:PERCENTAGE]"/>
+          <declaration property="font-style" value="{($font-style-unambiguous, 'normal')[1]}" shorthand="{$id}"/>
+          <declaration property="font-variant" value="{($font-variant-unambiguous, 'normal')[1]}" shorthand="{$id}"/>
+          <declaration property="font-weight" value="{($font-weight-unambiguous, 'normal')[1]}" shorthand="{$id}"/>
+          <declaration property="font-stretch" value="{($font-stretch-unambiguous, 'normal')[1]}" shorthand="{$id}"/>
+          <declaration property="font-size" value="{$font-size}" shorthand="{$id}"/>
+          <declaration property="line-height" value="{($line-height, 'normal')[1]}" shorthand="{$id}"/>
+          <declaration property="font-family" value="{string-join($font-family, ', ')}" shorthand="{$id}"/>
         </xsl:when>
 
         <xsl:when test="$prop='list-style'">
