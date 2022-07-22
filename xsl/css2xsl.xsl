@@ -161,7 +161,7 @@
     <xsl:param name="decl" as="element(declaration)"/>
     <xsl:variable name="sel" as="element(selector)+" select="$decl/../selector"/>
     <xsl:variable name="pseudo" as="xs:string*" 
-      select="tokenize($sel/@pseudo, '\s+')[not(. = $condition-inducing-pseudos)]"/>
+      select="tokenize($sel[1]/@pseudo, '\s+')[not(. = $condition-inducing-pseudos)]"/>
     <xsl:if test="count($pseudo) gt 1">
       <xsl:message terminate="yes" select="'Unsupported: Different pseudos in ', $sel"/>
     </xsl:if>
