@@ -73,7 +73,7 @@
                             or
                             tokenize($prop-constraint, '\s+') = string(@property)">
                 <xslout:attribute 
-                  name="{tr:prop-attr-name(.)}" 
+                  name="{tr:prop-attr-name(., $current-node)}" 
                   select="'{  
                             if(@property eq 'content') 
                             then tr:quote-single-quotes(@value) 
@@ -87,7 +87,7 @@
             <xslout:copy-of 
                   select="$more-attributes/@*[not(name() = ({string-join(
                                                                     for $d in $current-node/../declaration 
-                                                                    return concat('''', tr:prop-attr-name($d), ''''),
+                                                                    return concat('''', tr:prop-attr-name($d, $current-node), ''''),
                                                                     ', '
                                                                   )}))]" />
             <xslout:if test="$more-attributes/processing-instruction(fin)">
@@ -159,9 +159,9 @@
   
   <xsl:function name="tr:prop-attr-name" as="xs:string">
     <xsl:param name="decl" as="element(declaration)"/>
-    <xsl:variable name="sel" as="element(selector)+" select="$decl/../selector"/>
+    <xsl:param name="sel" as="element(selector)"/>
     <xsl:variable name="pseudo" as="xs:string*" 
-      select="tokenize($sel[1]/@pseudo, '\s+')[not(. = $condition-inducing-pseudos)]"/>
+      select="tokenize($sel/@pseudo, '\s+')[not(. = $condition-inducing-pseudos)]"/>
     <xsl:if test="count($pseudo) gt 1">
       <xsl:message terminate="yes" select="'Unsupported: Different pseudos in ', $sel"/>
     </xsl:if>
