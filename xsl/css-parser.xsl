@@ -41,6 +41,9 @@
       <xsl:when test="unparsed-text-available($resolved, 'UTF-8')">
         <xsl:sequence select="true()"/>
       </xsl:when>
+      <xsl:when test="unparsed-text-available($resolved, 'UTF-16')">
+        <xsl:sequence select="true()"/>
+      </xsl:when>
       <xsl:when test="unparsed-text-available($resolved, 'CP1252')">
         <xsl:sequence select="true()"/>
       </xsl:when>
@@ -59,17 +62,16 @@
       <xsl:when test="unparsed-text-available($resolved, 'UTF-8')">
         <xsl:sequence select="unparsed-text($resolved, 'UTF-8')"/>
       </xsl:when>
+      <xsl:when test="unparsed-text-available($resolved, 'UTF-16')">
+        <xsl:sequence select="unparsed-text($resolved, 'UTF-16')"/>
+      </xsl:when>
+      <xsl:when test="unparsed-text-available($resolved, 'CP1252')">
+        <xsl:sequence select="unparsed-text($resolved, 'CP1252')"/>
+      </xsl:when>
       <xsl:otherwise>
-        <xsl:choose>
-          <xsl:when test="unparsed-text-available($resolved, 'CP1252')">
-            <xsl:sequence select="unparsed-text($resolved, 'CP1252')"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:message>External stylesheet '<xsl:value-of select="$href-attr-or-css-url-value"/>' 
-(resolved as <xsl:value-of select="$resolved"/>) not found
-or wrong encoding. Supported encodings: UTF-8, CP1252 (the latter should work for ISO-8859-1, too)</xsl:message>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:message>External stylesheet '<xsl:value-of select="$href-attr-or-css-url-value"/>' (resolved as
+            <xsl:value-of select="$resolved"/>) not found or wrong encoding. 
+Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-1, too)</xsl:message>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
