@@ -119,7 +119,7 @@ GREATER  ::= w '>'
 COMMA    ::= w ','
 TILDE    ::= w '~'
 NOT      ::= ':' N O T '('
-DIMENSION ::= '-'?num S? ( 'ch' | 'cm' | 'em' | 'ex' | 'fr' | 'in' | 'mm' | 'pc' | 'pt' | 'px' | 'Q' | 'rem' | 'vh' | 'vmax' | 'vmin' | 'vw' | 'dpi' )
+DIMENSION ::= '-'?num S? ( 'ch' | 'cm' | 'em' | 'ex' | 'fr' | 'in' | 'mm' | 'pc' | 'pt' | 'px' | 'Q' | 'rem' | 's' | 'vh' | 'vmax' | 'vmin' | 'vw' | 'dpi' )
 Char     ::= #x0009
            | #x000A
            | #x000D
