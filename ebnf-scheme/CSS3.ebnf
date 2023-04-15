@@ -30,11 +30,22 @@ universal
          ::= namespace_prefix? '*'
 class    ::= '.' IDENT
 printcssrule ::= '@media print' 
-mediarule ::= '@media' S conditions ( S? conditions| S?  mediaquery_selector )*
+mediarule ::= '@media' S media_query_list
+media_query_list ::= media_query S? (COMMA S? media_query)*
+media_query ::= (
+                    (notonly S)? media_type (S and S media_feature_expression)*
+                  | media_feature_expression (S and S media_feature_expression)*
+                ) S*
+notonly ::= (not | only)
+and ::= 'and'
+not ::= 'not'
+only ::= 'only'
+media_type ::= ('all'|'print'|'screen'|'amzn-mobi'|'amzn-kf8'|'amzn-mobi7')
+media_feature_expression ::= '(' S? media_feature_name (S? ':' S? value)? S? ')'
+media_feature_name ::= IDENT
 pagerule ::= '@page' S? pagearea?
 arearule::= '@'('bottom-left'|'bottom-right'|'top-left'|'top-right')
 atrule  ::= '@' IDENT
-conditions ::=  ('and'|'screen'|'or'|'only'|'not'|'amzn-mobi'|'amzn-kf8'|'amzn-mobi7'|',') 
 attrib   ::= '[' S* namespace_prefix? IDENT S* ( ( PREFIXMATCH  | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH ) S* ( IDENT | QUOTED_STRING ) S* )? ']'
 pseudo   ::= ':' ':'? ( IDENT | functional_pseudo )
 functional_pseudo

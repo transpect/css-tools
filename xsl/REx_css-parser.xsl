@@ -283,12 +283,32 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
     <condition>
       <xsl:value-of select="normalize-space(.)"/>
     </condition>
-    <xsl:for-each select="mediaquery_selector">
-      <condition type="{current()/declaration/property//text()}">
-        <xsl:value-of select="current()/declaration/values"/>
-      </condition>
+    <xsl:for-each select="media_query_list">
+      <xsl:apply-templates select="media_query" mode="#current"/>
     </xsl:for-each>
   </xsl:template>
+  
+  <xsl:template match="media_query | media_type | media_feature_expression | media_feature_name
+                       | and | not | only | value | TOKEN | DIMENSION" mode="post-process">
+    <xsl:element name="{name()}">
+      <xsl:apply-templates mode="#current"/>
+    </xsl:element>
+  </xsl:template>
+  
+  <xsl:template match="IDENT" mode="post-process">
+    <xsl:value-of select="."/>
+  </xsl:template>
+  
+  <xsl:template match="media_type/TOKEN" mode="post-process">
+    <xsl:value-of select="."/>
+  </xsl:template>
+  
+  <xsl:template match="and/TOKEN | not/TOKEN | only/TOKEN | media_feature_expression/TOKEN" mode="post-process"/>
+  
+  <xsl:template match="media_feature_expression/value | notonly" mode="post-process">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
   
   <xsl:template match="query_declaration | pagerule " mode="post-process">
     <xsl:apply-templates mode="#current"/>
