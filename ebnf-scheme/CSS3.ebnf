@@ -11,15 +11,14 @@ declaration ::=  (property S? ':'  (property ':')* S? values)
 selectors_group
          ::= selector ( COMMENT? COMMA S* selector )*  
 selector ::= simple_selector_sequence ( combinator simple_selector_sequence )*
-mediaquery_selector::= '(' declaration ')'
 combinator
          ::= PLUS S*
            | GREATER S*
            | TILDE S*
            | S+
 simple_selector_sequence
-         ::= ( type_selector | universal ) ( HASH | class | attrib | pseudo | negation | atrule | mediaquery_selector )*
-           | ( HASH | class | attrib | pseudo | negation | atrule| mediaquery_selector )+
+         ::= ( type_selector | universal ) ( HASH | class | attrib | pseudo | negation | atrule )*
+           | ( HASH | class | attrib | pseudo | negation | atrule )+
 type_selector
          ::= namespace_prefix? element_name
 namespace_prefix
