@@ -159,6 +159,7 @@ The purpose of expansion is to find out the actual styling that is applied to a 
 
 We wanted to be able to parse stuff like `calc()`, `scale()`, `translateX()`, `rgba()` in a less cumbersome way than with regexes. 
 
+
 ## Comments and whitespace
 
 There are customers who want to retain the comments in the re-serialized CSS. Comments in rules (in selectors and properties) have proved to be particularly difficult to handle. With the previous regex-based approach, we just split between the rules and if there were comments anywhere within a rule, they were pulled out of it and went immediately before it in the serialization. However, this is no longer possible with the REx-generated parser. 
