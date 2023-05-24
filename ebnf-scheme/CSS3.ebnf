@@ -40,7 +40,7 @@ and ::= 'and'
 not ::= 'not'
 only ::= 'only'
 media_type ::= ('all'|'print'|'screen'|'amzn-mobi'|'amzn-kf8'|'amzn-mobi7')
-media_feature_expression ::= '(' S? media_feature_name (S? ':' S? value)? S? ')'
+media_feature_expression ::= '(' S? media_feature_name (S? ':' S? mediaquery_value)? S? ')'
 media_feature_name ::= IDENT
 pagerule ::= '@page' S? pagearea?
 arearule::= '@'('bottom-left'|'bottom-right'|'top-left'|'top-right')
@@ -52,7 +52,8 @@ functional_pseudo
 pagearea::= ':'('left'|'right')
 property ::= ( QUOTED_STRING | IDENT )
 values ::= value (S value | S* '/' S* value )* ( S* COMMA S* value (S value | '/' value )* )* important?
-value ::= ( URL | ATTR | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | QUOTED_STRING | IDENT | functional_pseudo) 
+value ::= ( URL | ATTR | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | QUOTED_STRING | IDENT | functional_pseudo)
+mediaquery_value ::= ( value | NUMBER ('/' NUMBER)? )
 expression     ::= ( ( PLUS | PERCENTAGE | URL | ATTR | HEX | '-' | DIMENSION  | NUMBER | QUOTED_STRING | IDENT | COMMA) S* )+
 negation ::= NOT S* negation_arg S* ')'
 negation_arg
