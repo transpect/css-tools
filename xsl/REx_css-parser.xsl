@@ -158,9 +158,12 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
 
   <xsl:function name="tr:resolve-attributes" as="xs:string">
     <xsl:param name="var-resolve-attributes" as="element(attrib)" />
-    <xsl:variable name="quots">"</xsl:variable>
     <xsl:variable name="attribute" select="$var-resolve-attributes/*:IDENT[1][preceding-sibling::*[1][self::*:TOKEN[matches(.,'\[')]]]"/>
-    <xsl:variable name="value" select="replace($var-resolve-attributes/*[following-sibling::*[1][self::TOKEN[matches(.,'\]')]]],$quots,'')"/>
+    <!-- this should probably be adapted to the improved grammar that gives QUOTED_STRING -->
+    <xsl:variable name="possibly-quoted-value" as="element()" select="$var-resolve-attributes/*[following-sibling::*[1][self::TOKEN[matches(.,'\]')]]]"/>
+    <xsl:variable name="value" select="if (local-name($possibly-quoted-value) = 'QUOTED_STRING')
+                                       then tr:string-content($possibly-quoted-value)
+                                       else string($possibly-quoted-value)"/>
     <xsl:variable name="token" select="$var-resolve-attributes/descendant::*:TOKEN[not(matches(.,'\[|\]'))]"/>
     <xsl:variable name="atts_declaration">
       <xsl:choose>
@@ -389,10 +392,17 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
                 </xsl:element>    
               </xsl:if>
             </xsl:for-each-group>
+            <!-- The xsl:if code was inserted in 2017 and then removed a day later, in
+              https://github.com/transpect/css-tools/commit/4e21197
+              Saxon 10 complains: 
+              A sequence of more than one item is not allowed as the value of variable $url-container (<QUOTED_STRING>, <QUOTED_STRING>)
+              Saxon 9.8. seems to have optimized this error away because it determined that nothing useful
+              is been done with $url-container.
             <xsl:variable name="url-container" as="element(*)?" select=".//QUOTED_STRING|.//BARE_URL"/>
             <xsl:if test="exists($url-container)">
               
             </xsl:if>
+            -->
           </xsl:element>
         </xsl:otherwise>
       </xsl:choose>
