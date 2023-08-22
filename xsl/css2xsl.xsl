@@ -107,10 +107,10 @@
         <xslout:copy>
           <xslout:apply-templates select="@*" mode="#current" />
           <xslout:for-each select="$style-info/self::css:declaration">
-            <xslout:attribute name="{{concat(if (starts-with(@property, '-')) then '_' else '',
+            <xslout:attribute name="css:{{concat(if (starts-with(@property, '-')) then '_' else '',
                                              @property,
                                              if (@important='yes') then '_important' else ''
-                                    )}}" select="@value" namespace="http://www.w3.org/1996/css" />
+                                    )}}" select="@value" namespace="http://www.w3.org/1996/css"/>
           </xslout:for-each>
           <xslout:apply-templates select="node()" mode="#current" />
         </xslout:copy>
