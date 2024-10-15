@@ -1,13 +1,13 @@
-css      ::= S* ( (  rule | simple_atrule | import | mediaquery | printcssquery | COMMENT) S* )*
+css      ::= S* ( (  rule | simple_atrule | fontquery | import | mediaquery | COMMENT) S* )*
 simple_atrule  ::= ('@charset'|'@namespace') S+ QUOTED_STRING S* ';' 
+fontquery ::= '@font-face' S* '{' S* (COMMENT? S* declaration ( S* ';' S* declaration?)* ';'? S*)* COMMENT* S* '}'
 import ::= '@import' S+ ( QUOTED_STRING | URL ) S* ';'
-rule     ::= selectors_group S? '{' S* (COMMENT? S* declaration ( S? ';' S? declaration?)* ';'? S?)* COMMENT* S* '}'
-printcssquery ::= printcssrule S? '{' ( S? COMMENT* S? (pagequery| COMMENT|query_declaration) S*)* S? '}'
-mediaquery ::= mediarule S? '{' ( S? COMMENT* query_declaration)* S? '}'
-pagequery ::= pagerule S? '{' S* (areaquery| (COMMENT? S* declaration ( S? ';' S? declaration?)* ';'? S?)*) COMMENT* S* '}'
-areaquery ::= arearule S? '{' S* (COMMENT? S* declaration ( S? ';' S? declaration?)* ';'? S?)* COMMENT* S* '}'
-query_declaration ::= rule
-declaration ::=  (property S? ':'  (property ':')* S? values) 
+rule     ::= selectors_group S* '{' S* (COMMENT* S* declaration ( S* ';' S* declaration?)* ';'? S*)* COMMENT* S* '}'
+mediaquery ::= mediarule S* '{' ( S* COMMENT* S* (rule|pagequery|COMMENT) )* S* '}'
+
+pagequery ::= pagerule S* '{' (S* COMMENT* S*(areaquery|declaration ';'|COMMENT) )* S* '}'
+areaquery ::= '@'arearule S* '{' S* (COMMENT* S* declaration ( S* ';' S* declaration?)* ';'? S?)* COMMENT* S* '}'
+declaration ::=  (property S* ':' (property ':')* S* values) 
 selectors_group
          ::= selector ( COMMENT? COMMA S* selector )*  
 selector ::= simple_selector_sequence ( combinator simple_selector_sequence )*
@@ -28,7 +28,6 @@ element_name
 universal
          ::= namespace_prefix? '*'
 class    ::= '.' IDENT
-printcssrule ::= '@media print' 
 mediarule ::= '@media' S media_query_list
 media_query_list ::= media_query S? (COMMA S? media_query)*
 media_query ::= (
@@ -42,14 +41,14 @@ only ::= 'only'
 media_type ::= ('all'|'print'|'screen'|'amzn-mobi'|'amzn-kf8'|'amzn-mobi7')
 media_feature_expression ::= '(' S? media_feature_name (S? ':' S? mediaquery_value)? S? ')'
 media_feature_name ::= IDENT
-pagerule ::= '@page' S? pagearea?
-arearule::= '@'('bottom-left'|'bottom-right'|'top-left'|'top-right')
+pagerule ::= '@page' S* pageclass?
+pageclass ::= ':' ('first'|'blank'|'left'|'right')
+arearule::= ('bottom-left-corner'|'bottom-left'|'bottom-center'|'bottom-right'|'bottom-right-corner'|'top-left-corner'|'top-left'|'top-center'|'top-right'|'top-right-corner'|'left-top'|'left-middle'|'left-right'|'right-top'|'right-middle'|'right-bottom') 
 atrule  ::= '@' IDENT
 attrib   ::= '[' S* namespace_prefix? IDENT S* ( ( PREFIXMATCH  | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH ) S* ( IDENT | QUOTED_STRING ) S* )? ']'
 pseudo   ::= ':' ':'? ( IDENT | functional_pseudo )
 functional_pseudo
          ::= FUNCTION S* expression? ')'
-pagearea::= ':'('left'|'right')
 property ::= ( QUOTED_STRING | IDENT )
 values ::= value (S value | S* '/' S* value )* ( S* COMMA S* value (S value | '/' value )* )* important?
 value ::= ( URL | ATTR | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | QUOTED_STRING | IDENT | functional_pseudo)
@@ -79,7 +78,7 @@ BARE_URL_CHAR
             | [#x10000-#x10FFFF]
 BARE_URL_CHARS ::= (BARE_URL_CHAR)+
 important ::= S* '!' S* 'important'
-ident    ::= [-]? nmstart nmchar*
+ident    ::= [-]? nmstart nmchar* 
 name     ::= nmchar+
 nmstart  ::= [_a-zA-Z]
            | nonascii
