@@ -277,6 +277,7 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
   </xsl:template>
 
   <xsl:template match="fontquery[TOKEN = '@font-face']" mode="post-process">
+    <!-- this temporary element was created by Christine Windeln to handle font-face declarations by schema more precise -->
      <atrule type="@font-face">
       <xsl:copy-of select="ancestor::css[1]/@origin"/>
       <raw-css>
