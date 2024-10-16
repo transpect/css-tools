@@ -243,7 +243,7 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
   <!-- mode post-process -->
   
   <xsl:template match="S | atrule 
-                       | TOKEN[matches(.,'[\{\[}\]\};]|@page')]
+                       | TOKEN[matches(.,'[\{\[}\]\};]|@(page|font-face)')]
                        | simple_atrule[not(TOKEN[1] = '@import')]" mode="post-process"/>
   
   <xsl:template match="COMMENT" mode="post-process">
@@ -276,6 +276,17 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
     </atrule>
   </xsl:template>
 
+  <xsl:template match="fontquery[TOKEN = '@font-face']" mode="post-process">
+     <atrule type="@font-face">
+      <xsl:copy-of select="ancestor::css[1]/@origin"/>
+      <raw-css>
+        <xsl:attribute name="xml:space" select="'preserve'"/>
+        <xsl:value-of select="."/>
+      </raw-css>
+      <xsl:apply-templates mode="#current"/>
+    </atrule>
+  </xsl:template>
+  
   <xsl:template match="printcssrule | pagearea | arearule" mode="post-process">
     <condition>
       <xsl:value-of select="normalize-space(.)"/>
