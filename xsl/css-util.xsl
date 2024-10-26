@@ -24,6 +24,7 @@
       <xsl:variable name="_val" select="replace(normalize-space(substring-after(., ':')), '\s?!important', '')" />
       <xsl:variable name="check-shorthand-property" select="$prop=$css-shorthand-properties" as="xs:boolean" />
       <xsl:choose>
+        <xsl:when test="$prop = ''"/>
         <xsl:when test="$check-shorthand-property">
           <shorthand property="{$prop}" value="{$_val}" num="{position()}"/>
           <xsl:sequence select="tr:handle-shorthand-properties($prop, $_val, string(position()))" />
