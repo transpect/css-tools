@@ -288,7 +288,7 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
     </atrule>
   </xsl:template>
   
-  <xsl:template match="printcssrule | pagearea | arearule" mode="post-process">
+  <xsl:template match="printcssrule | pagearea" mode="post-process">
     <condition>
       <xsl:value-of select="normalize-space(.)"/>
     </condition>
@@ -361,9 +361,13 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
       </xsl:if>
       <xsl:if test="self::*:pagequery">
         <xsl:attribute name="type" select="'page'"/>
+        <xsl:if test="descendant::*:pageclass">
+          <xsl:attribute name="pageclass" select="descendant::*:pageclass/*:TOKEN[2]"/>
+        </xsl:if>
       </xsl:if>
       <xsl:if test="self::*:areaquery">
         <xsl:attribute name="type" select="'area'"/>
+        <xsl:attribute name="arearule" select="descendant::*:arearule"/> 
       </xsl:if>
       <raw-css xml:space="preserve">
         <xsl:value-of select="."/>
@@ -579,11 +583,15 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
     <xsl:text>]</xsl:text>
   </xsl:template>
 
-  <xsl:template match="node()" mode="post-process">
-    <xsl:copy >
+  <xsl:template match="node()" mode="post-process"> 
+    <xsl:copy>
       <xsl:apply-templates select="@*|node()" mode="#current" />
     </xsl:copy>
   </xsl:template>
+ 
+  
+  <xsl:template match="pageclass | arearule | areaquery/TOKEN[1]" mode="post-process"/>
+
 
   <!--  overridden function from css-util -->
   <xsl:function name="tr:handle-shorthand-properties" as="element(*)*" xmlns="http://www.w3.org/1996/css">
