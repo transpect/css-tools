@@ -53,7 +53,7 @@ property ::= ( QUOTED_STRING | IDENT )
 values ::= value (S value | S* '/' S* value )* ( S* COMMA S* value (S value | '/' value )* )* important?
 value ::= ( URL | ATTR | PLUS | HEX | PERCENTAGE | '-' | DIMENSION | NUMBER  | QUOTED_STRING | IDENT | functional_pseudo)
 mediaquery_value ::= ( value | NUMBER ('/' NUMBER)? )
-expression     ::= ( ( PLUS | PERCENTAGE | URL | ATTR | HEX | '-' | DIMENSION  | NUMBER | QUOTED_STRING | IDENT | COMMA) S* )+
+expression     ::= ( ( PLUS | PERCENTAGE | URL | ATTR | HEX | '-' | DIMENSION  | NUMBER | QUOTED_STRING | IDENT | COMMA | functional_pseudo ) S* )+
 negation ::= NOT S* negation_arg S* ')'
 negation_arg
          ::= type_selector
