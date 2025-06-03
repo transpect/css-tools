@@ -1,12 +1,12 @@
-css      ::= S* ( (  rule | simple_atrule | fontquery | import | mediaquery | COMMENT) S* )*
+css      ::= S* ( (  rule | simple_atrule | fontquery | import | mediaquery | pagequery | COMMENT) S* )*
 simple_atrule  ::= ('@charset'|'@namespace') S+ QUOTED_STRING S* ';' 
 fontquery ::= '@font-face' S* '{' S* (COMMENT? S* declaration ( S* ';' S* declaration?)* ';'? S*)* COMMENT* S* '}'
 import ::= '@import' S+ ( QUOTED_STRING | URL ) S* ';'
 rule     ::= selectors_group S* '{' S* (COMMENT* S* declaration ( S* ';' S* declaration?)* ';'? S*)* COMMENT* S* '}'
-mediaquery ::= mediarule S* '{' ( S* COMMENT* S* (rule|pagequery|COMMENT) )* S* '}'
-
-pagequery ::= pagerule S* '{' (S* COMMENT* S*(areaquery|declaration ';'|COMMENT) )* S* '}'
+mediaquery ::= mediarule S* '{' ( S* COMMENT* S* (rule | pagequery | COMMENT) )* S* '}'
+pagequery ::= pagerule S* '{' (S* COMMENT* S*(areaquery | footnotequery | declaration ';'|COMMENT) )* S* '}'
 areaquery ::= '@'arearule S* '{' S* (COMMENT* S* declaration ( S* ';' S* declaration?)* ';'? S?)* COMMENT* S* '}'
+footnotequery ::= '@footnote' S* '{' S* (COMMENT? S* declaration ( S* ';' S* declaration?)* ';'? S*)* COMMENT* S* '}'
 declaration ::=  (property S* ':' (property ':')* S* values) 
 selectors_group
          ::= selector ( COMMENT? COMMA S* selector )*  
@@ -41,7 +41,8 @@ only ::= 'only'
 media_type ::= ('all'|'print'|'screen'|'amzn-mobi'|'amzn-kf8'|'amzn-mobi7')
 media_feature_expression ::= '(' S? media_feature_name (S? ':' S? mediaquery_value)? S? ')'
 media_feature_name ::= IDENT
-pagerule ::= '@page' S* pageclass?
+pagerule ::= '@page' S* (pageclass | pagename)?
+pagename ::= IDENT
 pageclass ::= ':' ('first'|'blank'|'left'|'right')
 arearule::= ('bottom-left-corner'|'bottom-left'|'bottom-center'|'bottom-right'|'bottom-right-corner'|'top-left-corner'|'top-left'|'top-center'|'top-right'|'top-right-corner'|'left-top'|'left-middle'|'left-right'|'right-top'|'right-middle'|'right-bottom') 
 atrule  ::= '@' IDENT

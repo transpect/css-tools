@@ -352,9 +352,9 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
     </xsl:apply-templates>
   </xsl:template>
   
-  <xsl:template match="*:rule | *:pagequery | *:areaquery" mode="post-process">
+  <xsl:template match="*:rule | *:pagequery | *:areaquery | *:footnotequery" mode="post-process">
     <xsl:param name="origin" tunnel="yes"/>
-    <xsl:element name="{if (descendant::*:atrule or self::*:pagequery or self::areaquery) then 'atrule' else 'ruleset'}" namespace="http://www.w3.org/1996/css">
+    <xsl:element name="{if (descendant::*:atrule or self::*:pagequery or self::areaquery or self::footnotequery) then 'atrule' else 'ruleset'}" namespace="http://www.w3.org/1996/css">
       <xsl:attribute name="origin" select="$origin"/>
       <xsl:if test="descendant::*:atrule or self::*:pagequery">
         <xsl:attribute name="type" select="descendant::*:atrule/*:IDENT"/>
@@ -364,10 +364,16 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
         <xsl:if test="descendant::*:pageclass">
           <xsl:attribute name="pageclass" select="descendant::*:pageclass/*:TOKEN[2]"/>
         </xsl:if>
+        <xsl:if test="descendant::*:pagename">
+          <xsl:attribute name="pagename" select="descendant::*:pagename/*:IDENT"/>
+        </xsl:if>
       </xsl:if>
       <xsl:if test="self::*:areaquery">
         <xsl:attribute name="type" select="'area'"/>
         <xsl:attribute name="arearule" select="descendant::*:arearule"/> 
+      </xsl:if>
+      <xsl:if test="self::*:footnotequery">
+        <xsl:attribute name="type" select="'footnote'"/>
       </xsl:if>
       <raw-css xml:space="preserve">
         <xsl:value-of select="."/>
@@ -465,6 +471,41 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
     <xsl:text>[index-of(for $e in ../* return generate-id($e), generate-id()) = count(../*)]</xsl:text>
   </xsl:template>
   
+  <xsl:template match="*:pseudo[tokenize(descendant::*:FUNCTION, '\s+') = 'nth-child(']" mode="post-process">
+    <xsl:variable name="child-number" select="descendant::*:NUMBER"/>
+    <xsl:value-of select="'[index-of(for $e in ../* return generate-id($e), generate-id()) = ', $child-number ,']'"/>
+  </xsl:template>
+  
+<!--  <xsl:template match="*:pseudo[descendant::*:FUNCTION = 'has(']" mode="post-process">
+    <xsl:variable name="selector" select="tokenize(descendant::*:expression[1],',')"/>
+    <xsl:for-each select="$selector">
+      <xsl:choose>
+        <xsl:when test="contains(current(),'+')">
+          <xsl:value-of select="translate(concat('[following-sibling::*[1][self::*:',current(),']]'),' +','')"/>
+        </xsl:when>
+        <xsl:when test="contains(current(),'>')">
+          <xsl:value-of select="translate(concat('[child::*:',current(),']'),' >','')"/>
+        </xsl:when>
+        <xsl:when test="contains(current(),'~')">
+          <xsl:value-of select="translate(concat('[following-sibling::*:',current(),']'),' ~','')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="replace(concat('[descendant::*:',current(),']'),'\s+','')"/>
+        </xsl:otherwise>
+      </xsl:choose>  
+    </xsl:for-each>
+  </xsl:template>-->
+  
+  <xsl:template match="*:pseudo[tokenize(descendant::*:FUNCTION, '\s+') = 'is(']" mode="post-process">
+    <xsl:variable name="selector" select="tokenize(descendant::*:expression,',')"/>
+    <xsl:text>[</xsl:text>
+    <xsl:for-each select="$selector">
+      <xsl:value-of select="replace(concat('*:',current()),'\s+','')"/>
+      <xsl:value-of select="if(position() != count($selector)) then (' | ') else()"/>
+    </xsl:for-each>
+    <xsl:text>]</xsl:text>
+  </xsl:template>
+  
   <xsl:template match="simple_selector_sequence/universal" mode="post-process">
     <xsl:text>*</xsl:text>
   </xsl:template>
@@ -488,18 +529,23 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
       <xsl:if test="descendant::*:pseudo">
         <xsl:attribute name="pseudo" select="descendant::*:pseudo/*:IDENT"/>
       </xsl:if>
+      <xsl:if test="descendant::*:pseudo/*:functional_pseudo">
+        <xsl:attribute name="pseudo" select="translate(descendant::*:pseudo[1]/*:functional_pseudo/*:FUNCTION,'(','')"/>
+        <xsl:attribute name="function" select="descendant::*:pseudo[1]/*:functional_pseudo/*:expression"/>         
+      </xsl:if>
       <xsl:apply-templates select="simple_selector_sequence[last()]" mode="#current"/>
     </selector>
   </xsl:template>
   
   <xsl:variable name="condition-inducing-pseudos" as="xs:string+"
-    select="('first-child', 'last-child')"/>
+    select="('first-child', 'last-child', 'before', 'nth-child(', 'has(', 'is(')"/>
   
   <xsl:template match="simple_selector_sequence" mode="post-process">
     <xsl:variable name="elements" select="universal | type_selector" as="element(*)*"/>
     <xsl:variable name="attribs" select="attrib" as="element(attrib)*"/>
     <xsl:variable name="other-conditions" as="element(*)*"
-      select="class | HASH | pseudo[tokenize(IDENT, '\s+') = $condition-inducing-pseudos]" />
+      select="class | HASH | pseudo[tokenize(IDENT, '\s+') = $condition-inducing-pseudos] 
+                           | pseudo[tokenize(descendant::FUNCTION[1], '\s+') = $condition-inducing-pseudos]" />
     <xsl:apply-templates select="$elements" mode="#current"/>
     <xsl:if test="empty($elements)">
       <xsl:text>*</xsl:text>
@@ -513,7 +559,7 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
     <xsl:apply-templates select="preceding-sibling::combinator[1]" mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="simple_selector_sequence/class" mode="post-process">
+  <xsl:template match="class" mode="post-process">
     <xsl:if test="exists(../following-sibling::combinator) 
                   or 
                   not(
@@ -590,7 +636,7 @@ Supported encodings: UTF-8, UTF-16, CP1252 (the latter should work for ISO-8859-
   </xsl:template>
  
   
-  <xsl:template match="pageclass | arearule | areaquery/TOKEN[1]" mode="post-process"/>
+  <xsl:template match="pageclass | arearule | areaquery/TOKEN[1] | footnotequery/TOKEN[1] | pagename" mode="post-process"/>
 
 
   <!--  overridden function from css-util -->
